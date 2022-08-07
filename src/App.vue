@@ -1,19 +1,45 @@
 <template>
-  <main class="content container">
+  <div>
+    <Header />
+    <main class="content container">
     <router-view />
-  </main>
+    </main>
+    <Footer />
+  </div>
+
 
 </template>
 
 <script>
-import MainPage from '@/pages/MainPage';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import instance from '@/axiosConfig';
+
+import { mapActions,mapMutations } from 'vuex'
 
 export default {
+  data() {
+    return {
+      userAccessKey:''
+    }
+  },
+  methods: {
+    ...mapActions(['getBasket']),
+    ...mapMutations(['updateUserAccessKey'])
+  },
   mounted() {
     // console.log('hello')
+    const userAccessKey = localStorage.getItem('userAccessKey')
+    if (userAccessKey) {
+      this.updateUserAccessKey(userAccessKey)
+    }
+
+
+    this.getBasket()
   },
   components: {
-    MainPage,
+    Header,
+    Footer
   },
 };
 </script>

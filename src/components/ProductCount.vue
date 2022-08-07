@@ -7,7 +7,10 @@
       </svg>
     </button>
 
-    <input type="text" :value="counter" name="count" />
+    <input type="text"
+           v-model="counter"
+           name="count"
+            autocomplete="off"/>
 
     <button type="button"
             aria-label="Добавить один товар"
@@ -43,12 +46,15 @@ export default {
   },
   watch: {
     counter(value) {
-      this.$emit('update:amount', value)
+      console.log(value)
+      this.$emit('update:productCount', value)
     }
   },
 };
 </script >
 
 <style scoped>
-
+input[name='count'] {
+  outline: none;
+}
 </style >
