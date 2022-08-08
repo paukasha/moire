@@ -37,19 +37,7 @@
           </ul>
         </div>
 
-        <div class="cart__block" v-if="basketProducts.length">
-          <p class="cart__desc">
-            Мы&nbsp;посчитаем стоимость доставки на&nbsp;следующем этапе
-          </p>
-          <p class="cart__price">
-            Итого: <span>{{ basketTotalPrice | numberFormat}} ₽</span>
-          </p>
-
-          <router-link :to="{name: 'Order', path: 'order'}"
-                       class="cart__button button button--primery" >
-            Оформить заказ
-          </router-link>
-        </div>
+        <BasketInfoOrder />
       </form>
     </section>
   </div>
@@ -59,13 +47,15 @@
 import { mapGetters } from 'vuex';
 import wordDecline from "@/helpers/decline";
 import { declineProductDict } from "@/helpers/declineWordsDict";
+import BasketInfoOrder from '@/components/BasketInfoOrder'
 
 import BasketProduct from '@/components/BasketProduct'
 import numberFormat from '@/helpers/numberFormat';
 
 export default {
   components:{
-    BasketProduct
+    BasketProduct,
+    BasketInfoOrder
   },
   data() {
     return {

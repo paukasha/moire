@@ -84,30 +84,7 @@
         </ul>
       </div>
 
-      <div class="cart__block">
-        <ul class="cart__orders">
-          <li class="cart__order">
-            <h3>Смартфон Xiaomi Redmi Note 7 Pro 6/128GB</h3>
-            <b>990 ₽</b>
-            <span>Артикул: 150030</span>
-          </li>
-          <li class="cart__order">
-            <h3>Гироскутер Razor Hovertrax 2.0ii</h3>
-            <b>1 990 ₽</b>
-            <span>Артикул: 150030</span>
-          </li>
-          <li class="cart__order">
-            <h3>Электрический дрифт-карт Razor Lil’ Crazy</h3>
-            <b>4 090 ₽</b>
-            <span>Артикул: 150030</span>
-          </li>
-        </ul>
-
-        <div class="cart__total">
-          <p>Доставка: <b>бесплатно</b></p>
-          <p>Итого: <b>3</b> товара на сумму <b>4 070 ₽</b></p>
-        </div>
-      </div>
+      <BasketInfoOrder class="basketInfo"/>
     </form>
   </section>
   </div>
@@ -115,9 +92,11 @@
 
 <script >
 import { mapActions } from 'vuex';
-
+import BasketInfoOrder from '@/components/BasketInfoOrder'
 export default {
-
+components: {
+  BasketInfoOrder
+},
   computed: {
     orderInfo() {
       return this.$store.state.OrderInfo.orderInfo
@@ -134,6 +113,6 @@ mounted() {
 };
 </script >
 
-<style scoped>
+<style >
 
 </style >

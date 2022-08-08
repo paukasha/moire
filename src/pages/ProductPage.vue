@@ -37,9 +37,11 @@
         <div class="item__form">
           <form class="form" @submit.prevent="addToBasket">
             <div class="item__row item__row--center">
-              <ProductCount :product-count.sync="productCount"/>
+              <ProductCount :product-count.sync="productCount"
+              @error="error = $event"/>
 
-              <b class="item__price"> {{ productTotalPrice | numberFormat }} ₽ </b>
+              <span v-if="error" class="invalid-counter">{{ error }}</span>
+              <b v-else class="item__price"> {{ productTotalPrice | numberFormat }} ₽ </b>
             </div>
 
             <div class="item__row">
@@ -86,6 +88,7 @@
 
             <button class="item__button button button--primery"
                     type="submit"
+                    :disabled="error != ''"
             >В корзину</button>
           </form>
         </div>
@@ -128,7 +131,8 @@ export default {
         category: '',
         seasons: ''
       },
-      category: []
+      category: [],
+      error: ''
     };
   },
 
@@ -198,4 +202,13 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.invalid-counter {
+
+  color: red;
+  font-size: 20px;
+  white-space: nowrap;
+  left: -36px;
+  bottom: 0;
+}
+</style>

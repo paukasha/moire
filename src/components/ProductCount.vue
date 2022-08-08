@@ -7,10 +7,13 @@
       </svg>
     </button>
 
+    <ValidationProvider v-slot="{errors, dirty}"
+      rules="integer|positive|required">
     <input type="text"
-           v-model="counter"
+           v-model.number="counter"
            name="count"
            autocomplete="off"/>
+    </ValidationProvider>
 
     <button type="button"
             aria-label="Добавить один товар"
@@ -24,8 +27,14 @@
 </template >
 
 <script >
+import { ValidationProvider, extend  } from 'vee-validate';
+import { min, digits, integer, required } from 'vee-validate/dist/rules';
+
 export default {
   props: ['productCount'],
+  components: {
+    ValidationProvider
+  },
   data() {
     return {
       counter: ''
@@ -37,16 +46,37 @@ export default {
   },
   methods: {
     incrementProductCount() {
-      this.counter = this.counter+1
+      this.counter = +this.counter+1
     },
    decrementProductCount() {
       if (this.counter == 1) return
-      this.counter = this.counter-1
+      this.counter = +this.counter-1
     }
   },
   watch: {
     counter(value) {
       this.$emit('update:productCount', value)
+      extend('positive', value => {
+        if (value > 0) {
+          this.$emit('error', '')
+          return true
+        }
+        this.$emit('error', 'Значение должно быть больше нуля')
+      });
+
+      extend('integer', {
+        ...integer,
+        message: () => {
+          this.$emit('error', 'Введите число')
+        }
+      })
+
+      extend('required', {
+        ...required,
+        message: () => {
+          this.$emit('error', 'Хорош баловаться! Поле является обязательным')
+        }
+      })
     }
   },
 };

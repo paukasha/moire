@@ -49,7 +49,7 @@
                   <input class="options__radio sr-only"
                          type="radio"
                          name="delivery"
-                         :value="delivery.id"
+                         :value="delivery"
                          v-model="selectedDelivery"
 
                   >
@@ -72,7 +72,7 @@
                   <input class="options__radio sr-only"
                          type="radio"
                          name="pay"
-                         :value="payment.id"
+                         :value="payment"
                          v-model="selectedPayment"
                   >
                   <span class="options__value">
@@ -85,29 +85,12 @@
           </div >
         </div >
 
-        <BasketInfoOrder />
-<!--        <div class="cart__block">-->
-<!--          <ul class="cart__orders">-->
-<!--            <li class="cart__order" v-for="product in basketProducts">-->
-<!--              <h3 >{{ product.product.title }}</h3 >-->
-<!--              <b >{{ product.price * product.quantity | numberFormat}} ₽</b >-->
-<!--              <span >Артикул: {{ product.product.id }}</span >-->
-<!--            </li >-->
-
-<!--          </ul >-->
-
-<!--          <div class="cart__total">-->
-<!--            <p >Доставка: <b >бесплатно</b ></p >-->
-<!--            <p >Итого:   <b>{{ basketProducts.length }}</b> {{ declineBasketProductsAmount }} на сумму <b >{{ basketTotalPrice | numberFormat }} ₽</b ></p >-->
-<!--          </div >-->
-
-<!--          <button class="cart__button button button&#45;&#45;primery"-->
-<!--                  type="submit"-->
-<!--          >-->
-<!--            Оформить заказ-->
-<!--          </button >-->
-<!--        </div>-->
-
+        <BasketInfoOrder :delivery="selectedDelivery">
+          <button class="cart__button button button--primery"
+                  type="submit">
+            Оформить заказ
+          </button >
+        </BasketInfoOrder>
 
         <div class="cart__error form__error-block">
           <h4 >Заявка не отправлена!</h4 >
@@ -172,7 +155,7 @@ export default {
   },
   watch: {
     selectedDelivery(val) {
-      this.getPayments(val)
+      this.getPayments(val.id)
     }
   },
   methods: {
@@ -183,7 +166,7 @@ export default {
       instance.get('deliveries')
         .then(res => {
           this.deliveries = res.data
-          this.selectedDelivery = res.data[0].id
+          this.selectedDelivery = res.data[0]
         }).catch(e => {
           console.log(e)
       })
@@ -196,15 +179,15 @@ export default {
       })
         .then(res => {
           this.payments = res.data
-          this.selectedPayment = res.data[0].id
+          this.selectedPayment = res.data[0]
         }).catch(e => {
         console.log(e)
       })
     },
     createOrder() {
       let dataForm = Object.assign({}, this.dataForm, {
-        deliveryTypeId: this.selectedDelivery,
-        paymentTypeId: this.selectedPayment
+        deliveryTypeId: this.selectedDelivery.id,
+        paymentTypeId: this.selectedPayment.id
       })
       instance.post('orders', dataForm, {
         params: {
