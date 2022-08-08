@@ -74,7 +74,7 @@ export default {
       isLoading: false,
 
       currentPage: 1,
-      perPage: 3,
+      perPage:  localStorage.getItem('perPage'),
       pagesCount: '',
       productsCount: '',
 
@@ -116,7 +116,8 @@ export default {
     selectedFilterData() {
       this.getProducts()
     },
-    perPage() {
+    perPage(val) {
+      localStorage.setItem('perPage', val)
       this.currentPage = 1
       this.getProducts()
     }

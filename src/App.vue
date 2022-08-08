@@ -28,7 +28,7 @@ export default {
     ...mapMutations(['updateUserAccessKey'])
   },
   mounted() {
-    // console.log('hello')
+
     const userAccessKey = localStorage.getItem('userAccessKey')
     if (userAccessKey) {
       this.updateUserAccessKey(userAccessKey)

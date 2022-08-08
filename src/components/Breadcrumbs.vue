@@ -3,18 +3,15 @@
     <li class="breadcrumbs__item">
       <router-link to="/" class="breadcrumbs__link" href="index.html"> Каталог </router-link>
     </li>
-    <li class="breadcrumbs__item">
-      <a class="breadcrumbs__link" @click.prevent="goToMainPage"> {{ cat.title }} </a>
-    </li>
-    <li class="breadcrumbs__item">
-      <a class="breadcrumbs__link"> {{ title }} </a>
+    <li class="breadcrumbs__item" v-for="crumb in crumbs">
+      <a class="breadcrumbs__link" @click.prevent="selectedCrumb(crumb)"> {{ crumb }} </a>
     </li>
   </ul>
 </template >
 
 <script >
 export default {
-  props:['category', 'productTitle'],
+  props:['category', 'productTitle', 'crumbs'],
   data() {
     return {
       cat: '',
@@ -26,8 +23,10 @@ export default {
     this.title = this.productTitle
   },
   methods: {
-    goToMainPage() {
-      this.$router.push({ name: 'MainPage', query: { categoryId: this.cat.id } })
+    selectedCrumb(crumb) {
+      console.log(crumb);
+      this.$emit('selectedCrumb', crumb)
+      // this.$router.push({ name: 'MainPage', query: { categoryId: this.cat.id } })
     }
   }
 

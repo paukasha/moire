@@ -48,6 +48,7 @@ export default {
     };
   },
   mounted() {
+    console.log(this.product);
     this.selectedColor = this.product.colors[0].color.code;
   },
   computed: {

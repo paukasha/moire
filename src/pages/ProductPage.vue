@@ -2,8 +2,9 @@
   <div v-if="isLoading">Загрузка</div>
   <div v-else>
     <div class="content__top">
-      <Breadcrumbs :category="category"
-                    :productTitle="product.title"/>
+      <Breadcrumbs :crumbs="crumbs"
+                   @selectedCrumb="goToPage($event)"
+      />
     </div>
 
 
@@ -107,6 +108,7 @@ import Breadcrumbs from '@/components/Breadcrumbs'
 import { mapActions } from 'vuex';
 
 export default {
+  name: 'ProductPage',
   components: {
     ProductCount,
     ProductInfoTabs,
@@ -136,11 +138,17 @@ export default {
   computed: {
     productTotalPrice() {
       return this.product.price * this.productCount
+    },
+    crumbs() {
+      return [this.category.title, this.product.title]
     }
   },
 
   methods: {
-...mapActions(['addProductToBasket']),
+    ...mapActions(['addProductToBasket']),
+    goToPage(event) {
+      this.$router.push({ name: 'MainPage', query: { categoryId: this.category.id } })
+    },
     addToBasket() {
   this.addProductToBasket({productId: this.product.id, colorId: this.selectedImageColor.id, sizeId: this.selectedSize, quantity: this.productCount })
     },

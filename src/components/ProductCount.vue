@@ -10,7 +10,7 @@
     <input type="text"
            v-model="counter"
            name="count"
-            autocomplete="off"/>
+           autocomplete="off"/>
 
     <button type="button"
             aria-label="Добавить один товар"
@@ -46,7 +46,6 @@ export default {
   },
   watch: {
     counter(value) {
-      console.log(value)
       this.$emit('update:productCount', value)
     }
   },
