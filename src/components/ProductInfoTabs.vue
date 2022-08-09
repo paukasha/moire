@@ -62,7 +62,7 @@
 <script>
 
 export default {
-  props: ['infoProduct'],
+  props: ['productInfo'],
   data() {
     return {
       currentTab: '',
@@ -74,12 +74,12 @@ export default {
         id: 2,
         title: 'Доставка и возврат'
       }],
-      productInfo: ''
+      // productInfo: ''
     };
   },
-  created() {
+  mounted() {
     this.currentTab = this.tabs[0];
-    this.productInfo = this.infoProduct;
+    // this.productInfo = this.infoProduct;
   },
 };
 </script>

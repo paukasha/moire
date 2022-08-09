@@ -20,7 +20,14 @@
       </div>
     </div>
 
-    <section class="cart"
+    <Loader v-if="$store.state.Basket.isLoading"/>
+
+    <RequestError v-else-if="$store.state.Basket.requestError"
+                  :error="$store.state.Basket.requestError"
+                  @load="getBasket"
+    />
+    <section v-else
+             class="cart"
              :style="!basketProducts.length ? {height: '240px'} : ''">
 
       <form class="cart__form form">
@@ -43,23 +50,30 @@
 import BasketInfoOrder from '@/components/Basket/BasketInfoOrder';
 import BasketProduct from '@/components/Basket/BasketProduct';
 import Breadcrumbs from '@/components/UI/Breadcrumbs';
+import Loader from '@/components/UI/Loader/Loader';
+import RequestError from '@/components/UI/RequestError';
 
 import numberFormat from '@/helpers/numberFormat';
 import wordDecline from '@/helpers/decline';
 import { declineProductDict } from '@/helpers/wordsDict';
 
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   components: {
     BasketProduct,
     BasketInfoOrder,
     Breadcrumbs,
+    Loader,
+    RequestError
   },
   data() {
     return {
       crumbs: ['Корзина'],
     };
+  },
+  methods: {
+    ...mapActions(['getBasket'])
   },
   computed: {
     ...mapGetters(['basketProducts', 'basketTotalPrice']),

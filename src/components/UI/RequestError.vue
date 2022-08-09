@@ -4,7 +4,7 @@
     <button class="request-error__btn"
     type="button"
     @click.prevent="$emit('load')">
-      Попробовать загрузить еще раз
+      Попробовать обновить
     </button>
   </div>
 </template>

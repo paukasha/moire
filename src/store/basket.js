@@ -9,6 +9,8 @@ export default {
     basket: [],
     basketTotalPrice: 0,
     userAccessKey: '',
+    requestError: '',
+    isLoading: false
   }),
   actions: {
     getUserAccessKey(context) {
@@ -21,9 +23,14 @@ export default {
       }
     },
     getBasket(context) {
+      context.state.isLoading = true
       instance.get('baskets',)
         .then(res => {
-        context.commit('updateBasket', res.data.items)
+          context.state.isLoading = false
+          context.commit('updateBasket', res.data.items)
+      }).catch(e => {
+        context.state.isLoading = false
+        context.state.requestError = 'При загрузке корзины произошла ошибка'
       })
     },
     addProductToBasket(context, {productId, colorId, sizeId, quantity}) {
@@ -35,6 +42,8 @@ export default {
       }).then(res => {
         console.log(res)
         context.commit('updateBasket', res.data.items)
+      }).catch(e => {
+        context.state.requestError = 'При добавлении товара в корзину произошла ошибка. Пожалуйста, обновите страницу '
       })
     },
     updateCartProductAmount(context, {productId, productAmount}) {

@@ -16,23 +16,27 @@
               <BaseFieldText title="ФИО"
                              v-model="dataForm.name"
                              rules="required"
-                             placeholder="Введите ваше полное имя"/>
+                             placeholder="Введите ваше полное имя"
+              />
 
               <BaseFieldText title="Адрес"
                              v-model="dataForm.address"
                              rules="required"
-                             placeholder="Введите ваш адрес"/>
+                             placeholder="Введите ваш адрес"
+              />
 
               <BaseFieldText title="Email"
                              v-model="dataForm.email"
                              rules="required|email"
-                             placeholder="Введите ваш email"/>
+                             placeholder="Введите ваш email"
+              />
 
               <BaseFieldText title="Телефон"
                              v-mask="'+7 (###)-###-##-##'"
                              v-model="dataForm.phone"
                              rules="required"
-                             placeholder="Введите ваш телефон"/>
+                             placeholder="Введите ваш телефон"
+              />
 
               <BaseFieldTextArea title="Комментарий к заказу"
                                  v-model="dataForm.comment"
@@ -40,9 +44,19 @@
               />
             </div>
 
-            <div class="cart__options">
+            <Loader v-if="isLoading"/>
+            <div v-else
+                 class="cart__options"
+            >
               <h3 class="cart__title">Доставка</h3>
-              <ul class="cart__options options">
+              <div v-if="errors.deliveryError"
+                   class="cart__options options"
+              >
+                {{ errors.deliveryError }}
+              </div>
+              <ul v-else
+                  class="cart__options options"
+              >
                 <li class="options__item"
                     v-for="delivery in deliveries"
                     :key="delivery.id"
@@ -64,10 +78,12 @@
               </ul>
 
               <h3 class="cart__title">Оплата</h3>
+              <div v-if="errors.deliveryError">Наличный расчет / банковская карта</div>
               <ul class="cart__options options">
                 <li class="options__item"
                     v-for="payment in payments"
-                    :key="payment.id">
+                    :key="payment.id"
+                >
                   <label class="options__label">
                     <input class="options__radio sr-only"
                            type="radio"
@@ -87,16 +103,22 @@
 
           <BasketInfoOrder :delivery="selectedDelivery">
             <button class="cart__button button button--primery"
-                    type="submit">
+                    type="submit"
+            >
               Оформить заказ
             </button>
           </BasketInfoOrder>
 
-          <div class="cart__error form__error-block">
+          <div class="cart__error form__error-block"
+               v-if="errors.requestOrderError"
+          >
             <h4>Заявка не отправлена!</h4>
             <p>
               Похоже произошла ошибка. Попробуйте отправить снова или перезагрузите страницу.
             </p>
+            <RequestError
+              @load="createOrder"
+            />
           </div>
         </form>
       </ValidationObserver>
@@ -113,6 +135,8 @@ import BaseFormField from '@/components/Form/BaseFormField';
 import BaseFieldText from '@/components/Form/BaseFieldText';
 import BaseFieldTextArea from '@/components/Form/BaseFieldTextArea';
 import BasketInfoOrder from '@/components/Basket/BasketInfoOrder';
+import Loader from '@/components/UI/Loader/Loader';
+import RequestError from '@/components/UI/RequestError';
 
 import numberFormat from '@/helpers/numberFormat';
 
@@ -139,6 +163,8 @@ export default {
     BaseFieldText,
     BaseFieldTextArea,
     BasketInfoOrder,
+    Loader,
+    RequestError,
     ValidationProvider,
     ValidationObserver
   },
@@ -157,6 +183,12 @@ export default {
         email: '',
         comment: ''
       },
+      errors: {
+        deliveryError: '',
+        paymentsError: '',
+        requestOrderError: ''
+      },
+      isLoading: false
 
     };
   },
@@ -169,36 +201,44 @@ export default {
       this.$router.push({ name: 'Basket' });
     },
     getDeliveries() {
+      this.isLoading = true;
       instance.get('deliveries')
         .then(res => {
+          this.isLoading = false;
           this.deliveries = res.data;
           this.selectedDelivery = res.data[0];
         })
         .catch(e => {
-          console.log(e);
+          this.isLoading = false;
+          this.errors.deliveryError = 'К сожалению, доставка курьером временно не доступна.' +
+            'Приносим извинения за доставленные неудобства. Мы всегда рады видеть Вас в нашем магазине :)';
         });
     },
     getPayments(deliveryId) {
+      this.isLoading = true;
       instance.get('payments', {
         params: {
           deliveryTypeId: deliveryId
         }
       })
         .then(res => {
+          this.isLoading = false;
           this.payments = res.data;
           this.selectedPayment = res.data[0];
         })
         .catch(e => {
-          console.log(e);
+          this.isLoading = false;
         });
     },
     createOrder() {
+      this.isLoading = true;
       let dataForm = Object.assign({}, this.dataForm, {
         deliveryTypeId: this.selectedDelivery.id,
         paymentTypeId: this.selectedPayment.id
       });
       instance.post('orders', dataForm,)
         .then(res => {
+          this.isLoading = false;
           this.$router.push({
             name: 'OrderInfoPage',
             params: {
@@ -206,6 +246,10 @@ export default {
             }
           });
           this.$store.commit('updateBasket', []);
+        })
+        .catch(e => {
+          this.errors.requestOrderError = true;
+          this.isLoading = false;
         });
     }
   },
@@ -221,5 +265,8 @@ export default {
 </script>
 
 <style scoped>
-
+.form__error-block p {
+  display: inline-block;
+  margin-bottom: 20px;
+}
 </style>

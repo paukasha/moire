@@ -1,6 +1,11 @@
 <template>
   <aside class="filter">
+    <RequestError v-if="requestError"
+                  :error="requestError"
+                  @load="getFilterData"
+    />
     <form class="filter__form form"
+          v-else
           @submit.prevent="submit"
     >
       <fieldset class="form__block">
@@ -120,8 +125,13 @@
 import axios from 'axios';
 import instance from '@/axiosConfig';
 
+import RequestError from '@/components/UI/RequestError';
+
 export default {
   props: ['selectedFilterData'],
+  components: {
+    RequestError
+  },
   data() {
     return {
       categories: [],
@@ -137,7 +147,9 @@ export default {
         selectedSeasons: this.$route.query.seasonIds ? [...this.$route.query.seasonIds] : [],
         selectedMaterials: this.$route.query.materialIds ? [...this.$route.query.materialIds] : []
       },
-      fullPath: this.$route.fullPath
+      fullPath: this.$route.fullPath,
+      isLoading: '',
+      requestError: ''
     };
   },
   mounted() {
@@ -146,6 +158,7 @@ export default {
   },
   methods: {
     getFilterData() {
+      this.isLoading = true
       let endpoints = [
         'productCategories',
         'materials',
@@ -154,14 +167,17 @@ export default {
 
       axios.all(endpoints.map((endpoint) => instance.get(endpoint)))
         .then(
+
           axios.spread(({ data: productCategories }, { data: materials }, { data: seasons }) => {
             this.categories = productCategories.items;
             this.materials = materials.items;
             this.seasons = seasons.items;
+            this.isLoading = false
           })
         )
         .catch(e => {
-          console.log(e);
+          this.isLoading = false
+          this.requestError = 'Фильтр сломался'
         });
     },
     submit() {

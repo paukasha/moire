@@ -27,10 +27,13 @@
           </a>
         </li>
         <li>
-          <a class="footer__link footer__link--medium"
-             href="#">
-            Заказать звонок
-          </a>
+<!--          <transition name="orderInfoError" appear> :class="orderInfoError ? 'orderInfoError' : ''"-->
+            <a class="footer__link footer__link--medium "
+
+               href="#">
+              Заказать звонок
+            </a>
+<!--          </transition>-->
         </li>
       </ul>
 
@@ -95,9 +98,29 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      orderInfoError: true
+    }
+
+  }
+};
 </script>
 
-<style scoped>
+<style >
+.orderInfoError-enter-active, .orderInfoError-leave-active {
+  opacity: 1;
+  transition: opacity 3s;
 
+}
+.orderInfoError-enter, .orderInfoError-leave-to /* .fade-leave-active до версии 2.1.8 */ {
+  opacity: 0;
+}
+.orderInfoError {
+  border: 2px solid #e02d71;
+  padding: 6px;
+  border-radius: 4px;
+
+}
 </style>
