@@ -5,61 +5,60 @@
       class="catalog__pic"
       href="#"
     >
-      <img :src="selectedImageSrc || './img/no_image.jpg'" :alt="product.title" />
+      <img :src="selectedImageSrc || './img/no_image.jpg'"
+           :alt="product.title"/>
     </router-link>
 
     <h3 class="catalog__title">
       <a href="#"> {{ product.title }} </a>
     </h3>
 
-    <span class="catalog__price"> {{ product.price | numberFormat }} ₽ </span>
+    <span class="catalog__price">
+      {{ product.price | numberFormat }} ₽
+    </span>
 
-    <ul class="colors colors--black">
-      <li class="colors__item" v-for="color in product.colors">
-        <label class="colors__label">
-          <input
-            class="colors__radio sr-only"
-            v-model="selectedColor"
-            type="radio"
-            :value="color.color.code"
-          />
-          <span
-            class="colors__value"
-            :style="[
-              {
-                backgroundColor: color.color.code,
-                border: color.color.code == '#ffffff' ? '.5px solid #000' : '',
-              },
-            ]"
-          />
-        </label>
+    <ul class="colors colors--black" >
+      <li class="colors__item" v-for="color in product.colors"  :key="color.id">
+      <ProductColor :color="color.color"
+                    :selected-color.sync="selectedColor"
+      />
       </li>
+
     </ul>
   </li>
 </template>
 
 <script>
-import numberFormat from "@/helpers/numberFormat";
-import { changeImageColor } from "@/helpers/changeImageColor";
+import ProductColor from '@/components/UI/ProductColor';
+import numberFormat from '@/helpers/numberFormat';
+import { changeImageColor } from '@/helpers/changeImageColor';
+
 export default {
+  props: ['product'],
+  components: {
+    ProductColor
+  },
+  methods: {
+    show(ev) {
+      console.log(ev)
+    }
+  },
   data() {
     return {
-      selectedColor: "",
+      selectedColor: '',
     };
   },
   mounted() {
-    this.selectedColor = this.product.colors[0].color.code;
+    this.selectedColor = this.product.colors[0].color;
   },
   computed: {
     selectedImageSrc() {
       if (this.selectedColor) {
-        let product = this.product.colors.find((el) => el.color.code === this.selectedColor);
+        let product = this.product.colors.find((el) => el.color.code === this.selectedColor.code);
         return changeImageColor(product);
       }
     },
   },
-
-  props: ["product"],
   filters: {
     numberFormat,
   },

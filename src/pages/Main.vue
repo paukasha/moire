@@ -1,72 +1,80 @@
 <template>
   <div>
+    <div>
+      <div class="content__top">
+        <div class="content__row">
+          <h1 class="content__title">
+            Каталог
+          </h1>
 
-      <div>
-
-        <div class="content__top">
-          <div class="content__row">
-            <h1 class="content__title">
-              Каталог
-            </h1 >
-            <div class="totalInfo">
-              <div>
+          <div class="totalInfo">
+            <div>
                   <span class="content__info">
-                    Найдено <b >{{ productsCount }}
-                </b > {{ productDecline }} </span>
-              </div>
-
-              <div>
-                <span class="content__info">Показывать по </span>
-                <span v-for="length in perPageList"
-                      class="perPage"
-                      :key="length"
-                      @click="perPage = length"
-                :class="{'currentPerPage': perPage == length }">{{length}}&nbsp;</span>
-              </div>
-
+                    Найдено <b>{{ productsCount }}
+                </b> {{ productDecline }} </span>
             </div>
 
+            <div>
+              <span class="content__info">Показывать по </span>
+              <span v-for="length in perPageList"
+                    class="perPage"
+                    :key="length"
+                    @click="perPage = length"
+                    :class="{'currentPerPage': perPage == length }"
+              >{{ length }}&nbsp;</span>
+            </div>
           </div>
-        </div>
-
-        <div class="content__catalog">
-
-          <Filters :selected-filter-data.sync="selectedFilterData"
-                   @update-data="selectedFilterData = $event"/>
-
-
-          <section class="catalog">
-            <div v-if="isLoading">Загрузка</div>
-            <ul v-else class="catalog__list">
-              <ProductItem v-for="product in productsList"
-                           :key="product.id"
-                           :product="product"/>
-            </ul>
-
-            <Pagination v-model="currentPage"
-                        :pages-count="pagesCount"
-                        :current-page="currentPage"
-                        :products-count="productsCount"
-            />
-
-          </section>
         </div>
       </div>
 
+      <Loader v-if="isLoading"/>
+      <RequestError v-else-if="requestError"
+                    :error="requestError"
+                    @load="getProducts"
+      />
+
+      <div v-else
+           class="content__catalog"
+      >
+
+        <Filters :selected-filter-data.sync="selectedFilterData"
+                 @update-data="selectedFilterData = $event"
+        />
+
+        <section class="catalog">
+          <ul class="catalog__list">
+            <ProductItem v-for="product in productsList"
+                         :key="product.id"
+                         :product="product"
+            />
+          </ul>
+
+          <Pagination v-model="currentPage"
+                      :pages-count="pagesCount"
+                      :current-page="currentPage"
+                      :products-count="productsCount"
+          />
+
+        </section>
+      </div>
+    </div>
   </div>
 
 </template>
 
 <script>
-import instance from '@/axiosConfig'
-import ProductItem from '@/components/ProductItem'
-import Pagination from '@/components/UI/Pagination'
-import Filters from '@/components/Filters'
-import Header from '@/components/Layout/Header'
-import { createPages } from "@/helpers/pagination";
-import wordDecline from "@/helpers/decline";
-import { declineProductDict } from "@/helpers/declineWordsDict";
+import instance from '@/axiosConfig';
+import ProductItem from '@/components/ProductItem';
+import Pagination from '@/components/UI/Pagination';
+import Filters from '@/components/Filters';
+import Header from '@/components/Layout/Header';
+import Loader from '@/components/UI/Loader/Loader';
+import RequestError from '@/components/UI/RequestError';
+
+import wordDecline from '@/helpers/decline';
+import { declineProductDict } from '@/helpers/wordsDict';
 import { mapActions } from 'vuex';
+
 export default {
   data() {
     return {
@@ -74,13 +82,11 @@ export default {
       isLoading: false,
 
       currentPage: '',
-      perPage:  localStorage.getItem('perPage'),
+      perPage: localStorage.getItem('perPage'),
       pagesCount: '',
+      perPageList: [3, 6, 9],
+
       productsCount: '',
-
-      perPageList: [3,6,9],
-
-
       selectedFilterData: {
         selectedMaxPrice: this.$route.query.maxPrice ? this.$route.query.maxPrice : 0,
         selectedMinPrice: this.$route.query.minPrice ? this.$route.query.minPrice : 0,
@@ -88,69 +94,71 @@ export default {
         selectedSeasons: this.$route.query.seasonIds ? [...this.$route.query.seasonIds] : [],
         selectedMaterials: this.$route.query.materialIds ? [...this.$route.query.materialIds] : []
       },
-
-
-    }
+      requestError: ''
+    };
   },
   components: {
     Header,
     ProductItem,
     Pagination,
-    Filters
+    Filters,
+    Loader,
+    RequestError
   },
 
   mounted() {
-    this.currentPage = this.$route.query.page || 1
-  },
-  computed: {
-    productDecline() {
-      return wordDecline(this.productsCount, declineProductDict)
-    }
-  },
-  watch: {
-    currentPage(val) {
-      console.log(val)
-      this.getProducts()
-    },
-    selectedFilterData() {
-      this.getProducts()
-    },
-    perPage(val) {
-      localStorage.setItem('perPage', val)
-      this.getProducts()
-    }
+    this.currentPage = this.$route.query.page || 1;
   },
   methods: {
     ...mapActions(['getBasket']),
 
     getProducts() {
+      this.isLoading = true;
 
-      this.isLoading = true
-
-        instance.get('products', {
-          params: {
-            page: this.currentPage,
-            limit: this.perPage,
-            minPrice: this.selectedFilterData.selectedMinPrice,
-            maxPrice: this.selectedFilterData.selectedMaxPrice,
-            categoryId: this.selectedFilterData.selectedCategory,
-            materialIds: this.selectedFilterData.selectedMaterials ? [...this.selectedFilterData.selectedMaterials] : [],
-            seasonIds: this.selectedFilterData.selectedSeasons ? [...this.selectedFilterData.selectedSeasons] : []
-          }
-        }).then(res => {
-          this.isLoading = false
-          this.productsList = res.data.items
-         return res
-        }).then(res => {
-          this.productsCount = res.data.pagination.total
-          this.pagesCount = res.data.pagination.pages
+      instance.get('products', {
+        params: {
+          page: this.currentPage,
+          limit: this.perPage,
+          minPrice: this.selectedFilterData.selectedMinPrice,
+          maxPrice: this.selectedFilterData.selectedMaxPrice,
+          categoryId: this.selectedFilterData.selectedCategory,
+          materialIds: this.selectedFilterData.selectedMaterials ? [...this.selectedFilterData.selectedMaterials] : [],
+          seasonIds: this.selectedFilterData.selectedSeasons ? [...this.selectedFilterData.selectedSeasons] : []
+        }
+      })
+        .then(res => {
+          this.isLoading = false;
+          this.productsList = res.data.items;
+          return res;
         })
-
-
+        .then(res => {
+          this.productsCount = res.data.pagination.total;
+          this.pagesCount = res.data.pagination.pages;
+        })
+        .catch(e => {
+          this.isLoading = false;
+          this.requestError = 'При загрузке произошла ошибка';
+        });
     }
-
-  }
-}
+  },
+  computed: {
+    productDecline() {
+      return wordDecline(this.productsCount, declineProductDict);
+    }
+  },
+  watch: {
+    currentPage(val) {
+      this.getProducts();
+    },
+    selectedFilterData() {
+      this.getProducts();
+    },
+    perPage(val) {
+      localStorage.setItem('perPage', val);
+      this.getProducts();
+    }
+  },
+};
 </script>
 
 <style scoped>
@@ -176,4 +184,12 @@ export default {
   font-size: 18px;
   font-weight: bold;
 }
+
+.content__title {
+  display: flex;
+  align-items: center;
+  width: 170px;
+  justify-content: space-between;
+}
+
 </style>

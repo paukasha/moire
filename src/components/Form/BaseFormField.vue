@@ -1,18 +1,18 @@
-<template >
-  <div >
-   <slot></slot>
-    <span class="form__value">{{ title }}</span >
-    <span class="form__error">{{ error }}</span >
-  </div >
-</template >
+<template>
+  <div>
+    <slot></slot>
+    <span class="form__value">{{ title }}</span>
+    <span class="form__error">{{ error }}</span>
+  </div>
+</template>
 
-<script >
+<script>
 export default {
-props: ['title', 'error']
+  props: ['title', 'error']
 
 };
-</script >
+</script>
 
 <style scoped>
 
-</style >
+</style>

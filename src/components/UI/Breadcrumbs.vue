@@ -1,40 +1,35 @@
-<template >
+<template>
   <ul class="breadcrumbs">
     <li class="breadcrumbs__item">
-      <router-link to="/" class="breadcrumbs__link" href="index.html"> Каталог </router-link>
+      <router-link to="/"
+                   class="breadcrumbs__link"
+                   href="index.html">
+        Каталог
+      </router-link>
     </li>
-    <li class="breadcrumbs__item" v-for="crumb in crumbs">
-      <a class="breadcrumbs__link" @click.prevent="selectedCrumb(crumb)"> {{ crumb }} </a>
+    <li class="breadcrumbs__item"
+        v-for="crumb in crumbs">
+      <a class="breadcrumbs__link"
+         @click.prevent="selectedCrumb(crumb)">
+        {{ crumb }}
+      </a>
     </li>
   </ul>
-</template >
+</template>
 
-<script >
+<script>
 export default {
-  props:['category', 'productTitle', 'crumbs'],
-  data() {
-    return {
-      cat: '',
-      title: ''
-    }
-  },
-  mounted() {
-    this.cat = this.category
-    this.title = this.productTitle
-  },
+  props: ['crumbs'],
   methods: {
     selectedCrumb(crumb) {
-      console.log(crumb);
-      this.$emit('selectedCrumb', crumb)
-      // this.$router.push({ name: 'MainPage', query: { categoryId: this.cat.id } })
+      this.$emit('selectedCrumb', crumb);
     }
   }
-
 };
-</script >
+</script>
 
 <style scoped>
 .breadcrumbs__item:not(:last-child) {
   cursor: pointer;
 }
-</style >
+</style>

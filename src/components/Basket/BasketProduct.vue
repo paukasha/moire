@@ -1,36 +1,37 @@
-<template >
+<template>
   <li class="cart__item product"
-     >
+  >
     <div class="product__pic">
-      <img :src="product.color.gallery[0].file.url" width="120" height="120" srcset="img/product-square-4@2x.jpg 2x" alt="Название товара">
+      <img :src="product.color.gallery[0].file.url"
+           width="120"
+           height="120"
+           srcset="img/product-square-4@2x.jpg 2x"
+           :alt="product.product.title"
+      >
     </div>
     <h3 class="product__title">
       {{ product.product.title }}
     </h3>
     <div class="product__basket-info">
-      <p class="product__info product__info--color">
+      <div class="product__info product__info--color">
         Цвет:
-        <span>
-                  <i :style="[{backgroundColor: product.color.color.code,
-                               border: product.color.color.code == '#ffffff' ? '.5px solid #000' : '',
-                                      }]"
-                  ></i>
-                  {{ product.color.color.title }}
-                </span>
-      </p>
+        <ProductColor class="color" :color="product.color.color" />
+        {{ colorsDict[product.color.color.code] }}
+      </div>
 
       <p class="product__info ">
         Размер:
-        <span>{{ product.size.title }}</span>
+        <span>
+          {{ product.size.title }}
+        </span>
       </p>
     </div>
 
     <span class="product__code">
-                Артикул:  {{ product.product.id }}
-              </span>
+      Артикул:  {{ product.product.id }}
+    </span>
 
-    <ProductCount :product-count.sync="productCount"
-                 />
+    <ProductCount :product-count.sync="productCount" />
 
     <b class="product__price">
       {{ productTotalPrice | numberFormat }} ₽
@@ -39,63 +40,67 @@
     <button class="product__del button-del"
             type="button"
             aria-label="Удалить товар из корзины"
-    @click.prevent="deleteBasketProduct">
-      <svg width="20" height="20" fill="currentColor">
+            @click.prevent="deleteBasketProduct"
+    >
+      <svg width="20"
+           height="20"
+           fill="currentColor"
+      >
         <use xlink:href="#icon-close"></use>
       </svg>
     </button>
   </li>
-</template >
+</template>
 
-<script >
-import ProductCount from '@/components/UI/ProductCounter'
-import { mapActions } from 'vuex';
+<script>
+import ProductCount from '@/components/UI/ProductCounter';
+import ProductColor from '@/components/UI/ProductColor';
 import numberFormat from '@/helpers/numberFormat';
+import { colorsDict } from '@/helpers/wordsDict';
+import { mapActions } from 'vuex';
+
+
 export default {
+  props: ['product'],
   components: {
-    ProductCount
+    ProductCount,
+    ProductColor
   },
   data() {
     return {
-      productTotalPrice : ''
-    }
+      productTotalPrice: '',
+      colorsDict
+    };
   },
-
-  props: ['product'],
   methods: {
     ...mapActions(['updateCartProductAmount', 'deleteProduct']),
-    deleteBasketProduct() {
-        this.$store.dispatch('deleteProduct', this.product.id)
-    }
-  },
-  watch: {
-    productCount(val) {
-      console.log(val)
-    }
-  },
 
+    deleteBasketProduct() {
+      this.$store.dispatch('deleteProduct', this.product.id);
+    }
+  },
   computed: {
     productCount: {
       get() {
-          return this.product.quantity
-      }, set(val) {
-        this.productTotalPrice = val*this.product.price
-          this.$store.dispatch('updateCartProductAmount', {
-            productId: this.product.id,
-            productAmount: val
-          })
+        return this.product.quantity;
+      },
+      set(val) {
+        this.productTotalPrice = val * this.product.price;
+        this.$store.dispatch('updateCartProductAmount', {
+          productId: this.product.id,
+          productAmount: val
+        });
 
       }
     },
-
   },
   filters: {
     numberFormat
   }
 };
-</script >
+</script>
 
-<style scoped>
+<style >
 .button-del {
   cursor: pointer;
 }
@@ -103,8 +108,27 @@ export default {
 .product__info:first-child {
   margin-right: 10px;
 }
+
 .product__basket-info {
   grid-row: 2;
   display: flex;
+  align-items: center;
 }
-</style >
+
+.product__info--color {
+  display: flex;
+  align-items: center;
+}
+
+.product__info--color  span.colors__value {
+  padding-left: 0 !important;
+}
+
+.product__info--color label:hover +.colors__value::before {
+  border: none;
+}
+
+.product__info--color label:hover {
+  cursor: default;
+}
+</style>
