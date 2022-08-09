@@ -1,4 +1,4 @@
-import BaseFormField from '../components/BaseFormField'
+import BaseFormField from '../components/Form/BaseFormField'
 
 export default {
   props: ['title', 'error', 'placeholder', 'value'],

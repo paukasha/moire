@@ -12,7 +12,7 @@
       <div class="item__pics pics">
         <div class="pics__wrapper">
           <img width="570" height="570"
-               :src="selectedImageColor.url || './img/no_image.jpg'"
+               :src="selectedImageColor.url ? selectedImageColor.url : './img/no_image.jpg'"
                :alt="product.title" />
         </div>
         <ul class="pics__list">
@@ -20,10 +20,8 @@
             <a class="pics__link"
                @click.prevent="selectedImageColor = image"
               :class="{'pics__link--current': selectedImageColor.url == image.url}">
-              <img
-                width="98"
-                height="98"
-                :srcset="image.url"
+              <img :src="image.url || './img/no_image.jpg'"
+                   style="height: 141px"
                 alt="Название товара"
               />
             </a>
@@ -105,9 +103,9 @@
 import instance from "@/axiosConfig"
 import numberFormat from "@/helpers/numberFormat"
 import { changeImageColor } from "@/helpers/changeImageColor"
-import ProductCount from '@/components/ProductCount'
+import ProductCount from '@/components/UI/ProductCounter'
 import ProductInfoTabs from '@/components/ProductInfoTabs'
-import Breadcrumbs from '@/components/Breadcrumbs'
+import Breadcrumbs from '@/components/UI/Breadcrumbs'
 import { mapActions } from 'vuex';
 
 export default {
@@ -165,15 +163,13 @@ export default {
 
         this.product = res.data;
 
-
-
         this.filterColorImage = res.data.colors.map(el => {
             return {
               id: el.color.id,
               colorCode: el.color.code,
-              url: el.gallery.map(elem => {
+              url: el.gallery ? el.gallery.map(elem => {
                 return elem.file.url
-              }).join()
+              }).join() : ''
             }
         })
         this.selectedImageColor = this.filterColorImage[0]
@@ -210,5 +206,9 @@ export default {
   white-space: nowrap;
   left: -36px;
   bottom: 0;
+}
+
+.pics__link img {
+  height: 141px;
 }
 </style>

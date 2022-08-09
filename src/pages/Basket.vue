@@ -1,18 +1,7 @@
 <template >
   <div>
     <div class="content__top">
-      <ul class="breadcrumbs">
-        <li class="breadcrumbs__item">
-          <router-link to="/" class="breadcrumbs__link" >
-            Каталог
-          </router-link>
-        </li>
-        <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link">
-            Корзина
-          </a>
-        </li>
-      </ul>
+      <Breadcrumbs :crumbs="crumbs"/>
 
       <div class="content__row">
         <h1 class="content__title">
@@ -44,22 +33,29 @@
 </template >
 
 <script >
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import wordDecline from "@/helpers/decline";
 import { declineProductDict } from "@/helpers/declineWordsDict";
-import BasketInfoOrder from '@/components/BasketInfoOrder'
+import BasketInfoOrder from '@/components/Basket/BasketInfoOrder'
 
-import BasketProduct from '@/components/BasketProduct'
+import BasketProduct from '@/components/Basket/BasketProduct'
+import Breadcrumbs from '@/components/UI/Breadcrumbs';
 import numberFormat from '@/helpers/numberFormat';
+
+
 
 export default {
   components:{
     BasketProduct,
-    BasketInfoOrder
+    BasketInfoOrder,
+    Breadcrumbs
+  },
+  mounted() {
+
   },
   data() {
     return {
-
+      crumbs: ['Корзина']
     }
   },
   methods: {

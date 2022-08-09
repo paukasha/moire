@@ -25,7 +25,7 @@
       </ul >
 
       <div class="cart__total">
-        <p >Доставка: <b >{{ delivery.title }}</b ></p >
+        <p >Доставка: <b v-if="delivery">{{ delivery.title }}</b ></p >
         <p >Итого:   <b>{{ basketProducts.length }}</b> {{ declineBasketProductsAmount }} на сумму <b >{{ totalPrice | numberFormat }} ₽</b ></p >
       </div >
 
@@ -49,7 +49,12 @@ export default {
   computed: {
     ...mapGetters(['basketProducts', 'basketTotalPrice']),
     totalPrice() {
-      return (+this.basketTotalPrice) + (+this.delivery.price)
+      if (this.delivery) {
+        return (+this.basketTotalPrice) + (Number(this.delivery.price))
+      } else {
+        return (+this.basketTotalPrice)
+      }
+
     },
     declineBasketProductsAmount() {
       return wordDecline(this.basketProducts.length, declineProductDict)

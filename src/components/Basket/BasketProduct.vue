@@ -48,7 +48,7 @@
 </template >
 
 <script >
-import ProductCount from '@/components/ProductCount'
+import ProductCount from '@/components/UI/ProductCounter'
 import { mapActions } from 'vuex';
 import numberFormat from '@/helpers/numberFormat';
 export default {
@@ -79,7 +79,6 @@ export default {
       get() {
           return this.product.quantity
       }, set(val) {
-        console.log(val)
         this.productTotalPrice = val*this.product.price
           this.$store.dispatch('updateCartProductAmount', {
             productId: this.product.id,

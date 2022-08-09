@@ -12,9 +12,8 @@ export default {
   actions: {
     getOrderInfo(context, id) {
       // if (!id) return
-      instance.get(`orders/1096`, {
+      instance.get(`orders/${id}`, {
         params: {
-          userAccessKey: context.rootState.Basket.userAccessKey,
           orderId: id
         }
       }).then(res=> {

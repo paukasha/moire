@@ -34,7 +34,7 @@ export default {
 </script >
 
 <style scoped>
-.breadcrumbs__item {
+.breadcrumbs__item:not(:last-child) {
   cursor: pointer;
 }
 </style >

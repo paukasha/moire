@@ -1,40 +1,45 @@
 <template >
   <div >
+    <div class="content__top">
     <Breadcrumbs :crumbs="crumbs"
                  @selectedCrumb="goToPage($event)"
     />
+    </div>
     <section class="cart">
+      <ValidationObserver v-slot="{handleSubmit}">
       <form class="cart__form form"
-            @submit.prevent="createOrder"
+            @submit.prevent="handleSubmit(createOrder)"
       >
         <div class="cart__field">
           <div class="cart__data">
-
               <BaseFieldText title="ФИО"
                               v-model="dataForm.name"
-                             :error="formError.name"
+                             rules="required"
                           placeholder="Введите ваше полное имя"/>
 
             <BaseFieldText title="Адрес"
                            v-model="dataForm.address"
-                           :error="formError.address"
+                           rules="required"
                            placeholder="Введите ваш адрес"/>
 
             <BaseFieldText title="Email"
                            v-model="dataForm.email"
-                           :error="formError.email"
+                           rules="required|email"
                            placeholder="Введите ваш email"/>
 
 
             <BaseFieldText title="Телефон"
+                           v-mask="'+7 (###)-###-##-##'"
                            v-model="dataForm.phone"
-                           :error="formError.phone_number"
+                           rules="required"
                            placeholder="Введите ваш телефон"/>
+
 
               <BaseFieldTextArea title="Комментарий к заказу"
                                  v-model="dataForm.comment"
                                  placeholder="Ваши пожелания"
               />
+
 
           </div >
 
@@ -99,22 +104,36 @@
           </p >
         </div >
       </form >
+        </ValidationObserver>
     </section >
   </div >
 
 </template >
 
 <script >
-import Breadcrumbs from '@/components/Breadcrumbs';
-import { mapGetters } from 'vuex';
+import Breadcrumbs from '@/components/UI/Breadcrumbs';
+import { mapGetters, mapMutations } from 'vuex';
 import numberFormat from '@/helpers/numberFormat';
 import wordDecline from "@/helpers/decline";
 import { declineProductDict } from "@/helpers/declineWordsDict";
-import BaseFormField from '@/components/BaseFormField'
-import BaseFieldText from '@/components/BaseFieldText'
-import BaseFieldTextArea from '@/components/BaseFieldTextArea'
-import BasketInfoOrder from '@/components/BasketInfoOrder'
+import BaseFormField from '@/components/Form/BaseFormField'
+import BaseFieldText from '@/components/Form/BaseFieldText'
+import BaseFieldTextArea from '@/components/Form/BaseFieldTextArea'
+import BasketInfoOrder from '@/components/Basket/BasketInfoOrder'
 import instance from '@/axiosConfig';
+import { ValidationProvider,ValidationObserver , extend  } from 'vee-validate';
+import { email, digits, integer, required } from 'vee-validate/dist/rules';
+import {mask} from 'vue-the-mask'
+
+extend('required', {
+  ...required,
+  message: 'Поле не может быть пустым'
+})
+
+extend('email', {
+  ...email,
+  message: 'Некорректный email'
+})
 
 export default {
   components: {
@@ -122,8 +141,11 @@ export default {
     BaseFormField,
     BaseFieldText,
     BaseFieldTextArea,
-    BasketInfoOrder
+    BasketInfoOrder,
+    ValidationProvider,
+    ValidationObserver
   },
+  directives: {mask},
   data() {
     return {
       crumbs: ['Корзина', 'Оформить заказ' ],
@@ -138,12 +160,7 @@ export default {
         email: '',
         comment: ''
       },
-      formError: {
-        name: 'Поле не может быть пустым',
-        address: 'Поле не может быть пустым',
-        email: 'Поле не может быть пустым',
-        phone_number: 'Неверный формат'
-      }
+
     };
   },
   mounted() {
@@ -159,6 +176,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['updateBasket']),
     goToPage(event) {
       this.$router.push({ name: 'Basket' })
     },
@@ -189,14 +207,11 @@ export default {
         deliveryTypeId: this.selectedDelivery.id,
         paymentTypeId: this.selectedPayment.id
       })
-      instance.post('orders', dataForm, {
-        params: {
-          userAccessKey: this.$store.state.Basket.userAccessKey
-        }
-      }).then(res => {
+      instance.post('orders', dataForm, ).then(res => {
         this.$router.push({name: 'OrderInfoPage', params: {
             id: res.data.id
           }})
+        this.$store.commit('updateBasket', [])
       })
     }
   },

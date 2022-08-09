@@ -60,9 +60,9 @@
 <script>
 import instance from '@/axiosConfig'
 import ProductItem from '@/components/ProductItem'
-import Pagination from '@/components/Pagination'
+import Pagination from '@/components/UI/Pagination'
 import Filters from '@/components/Filters'
-import Header from '@/components/Header'
+import Header from '@/components/Layout/Header'
 import { createPages } from "@/helpers/pagination";
 import wordDecline from "@/helpers/decline";
 import { declineProductDict } from "@/helpers/declineWordsDict";
@@ -73,7 +73,7 @@ export default {
       productsList: [],
       isLoading: false,
 
-      currentPage: 1,
+      currentPage: '',
       perPage:  localStorage.getItem('perPage'),
       pagesCount: '',
       productsCount: '',
@@ -100,9 +100,7 @@ export default {
   },
 
   mounted() {
-    this.getProducts()
-
-
+    this.currentPage = this.$route.query.page || 1
   },
   computed: {
     productDecline() {
@@ -110,7 +108,8 @@ export default {
     }
   },
   watch: {
-    currentPage() {
+    currentPage(val) {
+      console.log(val)
       this.getProducts()
     },
     selectedFilterData() {
@@ -118,10 +117,8 @@ export default {
     },
     perPage(val) {
       localStorage.setItem('perPage', val)
-      this.currentPage = 1
       this.getProducts()
     }
-
   },
   methods: {
     ...mapActions(['getBasket']),

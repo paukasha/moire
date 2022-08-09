@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import MainPage from '../pages/MainPage';
+import MainPage from '../pages/Main';
 import Basket from '../pages/Basket';
 import Order from '../pages/Order';
-import OrderInfoPage from '../pages/OrderInfoPage';
-const ProductPage = () => import('@/pages/ProductPage')
+import OrderInfoPage from '../pages/OrderInfo';
+const ProductPage = () => import('@/pages/Product')
 
 Vue.use(VueRouter);
 

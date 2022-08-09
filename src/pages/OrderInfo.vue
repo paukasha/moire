@@ -1,23 +1,8 @@
 <template >
   <div>
   <div class="content__top">
-    <ul class="breadcrumbs">
-      <li class="breadcrumbs__item">
-        <a class="breadcrumbs__link" href="index.html">
-          Каталог
-        </a>
-      </li>
-      <li class="breadcrumbs__item">
-        <a class="breadcrumbs__link" href="cart.html">
-          Корзина
-        </a>
-      </li>
-      <li class="breadcrumbs__item">
-        <a class="breadcrumbs__link">
-          Оформление заказа
-        </a>
-      </li>
-    </ul>
+   <Breadcrumbs :crumbs="crumbs"
+                @selectedCrumb="goToPage($event)"/>
 
     <h1 class="content__title">
       Заказ оформлен <span>№ {{ orderInfo.id }}</span>
@@ -84,7 +69,7 @@
         </ul>
       </div>
 
-      <BasketInfoOrder class="basketInfo"/>
+      <BasketInfoOrder :delivery="orderInfo.deliveryType"/>
     </form>
   </section>
   </div>
@@ -92,11 +77,16 @@
 
 <script >
 import { mapActions } from 'vuex';
-import BasketInfoOrder from '@/components/BasketInfoOrder'
+import BasketInfoOrder from '@/components/Basket/BasketInfoOrder'
+import Breadcrumbs from '@/components/UI/Breadcrumbs';
 export default {
 components: {
-  BasketInfoOrder
+  BasketInfoOrder,
+  Breadcrumbs
 },
+  data:() => ({
+    crumbs: ['Корзина', 'Информация о заказе']
+  }),
   computed: {
     orderInfo() {
       return this.$store.state.OrderInfo.orderInfo
@@ -104,11 +94,14 @@ components: {
 
   },
 mounted() {
-  console.log(this.$route.params)
+
   this.getOrderInfo(this.$route.params.id)
 },
   methods: {
-    ...mapActions(['getOrderInfo'])
+    ...mapActions(['getOrderInfo']),
+    goToPage(){
+      this.$router.push({ name: 'Basket' })
+    }
   }
 };
 </script >
