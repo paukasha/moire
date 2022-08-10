@@ -47,7 +47,6 @@ export default {
         quantity
       })
         .then(res => {
-          console.log(res);
           context.commit('updateBasket', res.data.items);
         })
         .catch(e => {
@@ -68,12 +67,11 @@ export default {
             context.commit('updateBasket', res.data.items);
           })
           .catch(e => {
-            console.log(e);
+            context.state.requestError = 'При добавлении товара в корзину произошла ошибка. Пожалуйста, обновите страницу ';
           });
       }
     },
     deleteProduct(context, id) {
-      console.log(id);
       instance.delete('baskets/products', {
         data: {
           basketItemId: id
@@ -112,6 +110,11 @@ export default {
     },
     productsQuantity(state, getters) {
       return state.basket.length;
+    },
+    allProductsQuantity(state) {
+      return state.basket.reduce((acc,nextVal) => {
+        return acc+nextVal.quantity
+      }, 0)
     },
     basketTotalPrice(state, getters) {
       return getters.basketProducts ? getters.basketProducts.reduce((prevItem, nextItem) => {

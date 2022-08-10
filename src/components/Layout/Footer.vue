@@ -173,7 +173,7 @@ export default {
       isCallSend: false,
       phone: '',
       isCallOpen: false,
-      isSaleOpen: false
+      isSaleOpen: false,
     };
   },
   methods: {

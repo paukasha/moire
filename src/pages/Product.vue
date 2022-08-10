@@ -163,7 +163,7 @@ export default {
 
   methods: {
     ...mapActions(['addProductToBasket']),
-    goToPage(event) {
+    goToPage() {
       this.$router.push({
         name: 'MainPage',
         query: { categoryId: this.category.id }

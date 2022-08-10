@@ -2,7 +2,9 @@
   <header class="header container">
     <div class="header__wrapper">
       <span class="header__info">
-         <router-link :to="{name: 'MainPage', path: '/'}">Каталог</router-link></span>
+         <router-link :to="{name: 'MainPage', path: '/'}">
+           Каталог</router-link>
+      </span>
 
       <router-link :to="{name: 'MainPage', path: '/'}"
                    class="header__logo"
@@ -26,6 +28,7 @@
           <use xlink:href="#icon-cart"></use>
         </svg>
         <span class="header__count"
+              :class="{'productAdded': isProductAddToCart }" ref="cartIndicator"
               aria-label="Количество товаров">{{ productsQuantity }}</span>
       </router-link>
     </div>
@@ -36,12 +39,53 @@
 import { mapGetters } from 'vuex';
 
 export default {
+  data() {
+    return {
+      isProductAddToCart: false
+    }
+  },
+  watch: {
+    allProductsQuantity(val) {
+      this.isProductAddToCart = true
+
+      clearTimeout(this.productAdd)
+      this.productAdd = setInterval(() => {
+         this.isProductAddToCart= false
+      },400)
+    }
+  },
   computed: {
-    ...mapGetters(['productsQuantity'])
+    ...mapGetters(['productsQuantity', 'allProductsQuantity'])
   }
 };
 </script>
 
 <style scoped>
 
+.header {
+  background-color: #fff;
+  position: fixed;
+  margin: 0 60px;
+  z-index: 55;
+}
+
+.productAdded {
+  animation: product-added .4s linear;
+}
+
+@keyframes product-added {
+  0% {
+    width: 13px;
+    height: 13px;
+  }
+  50% {
+    width: 20px;
+    height: 20px;
+  }
+
+  100%{
+    width: 13px;
+    height: 13px;
+  }
+}
 </style>

@@ -106,13 +106,10 @@ export default {
   data() {
     return {
       crumbs: ['Корзина', 'Информация о заказе'],
-      // orderInfo: '',
-      // orderRequestError: '',
-      // isLoading: false
+
     };
   },
   mounted() {
-    console.log(this.$route.params.id);
     this.getOrderInfo(this.$route.params.id);
     if (this.requestError === 0) {
       this.$router.push({ name: '404' });

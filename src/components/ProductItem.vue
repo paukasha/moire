@@ -1,12 +1,21 @@
 <template>
   <li class="catalog__item">
+
     <router-link
       :to="{ name: 'ProductPage', params: { id: product.id } }"
       class="catalog__pic"
+      :style="perpage == 9 ? {height: '240px'} : ''"
       href="#"
     >
       <img :src="selectedImageSrc || './img/no_image.jpg'"
-           :alt="product.title"/>
+           :alt="product.title"
+           :style="perpage == 9 ? {height: '100%'} : ''"
+      />
+      <button class="add-basket__btn"
+              type="button"
+              @click.prevent="addToBasket"
+      >В корзину
+      </button>
     </router-link>
 
     <h3 class="catalog__title">
@@ -17,11 +26,14 @@
       {{ product.price | numberFormat }} ₽
     </span>
 
-    <ul class="colors colors--black" >
-      <li class="colors__item" v-for="color in product.colors"  :key="color.id">
-      <ProductColor :color="color.color"
-                    :selected-color.sync="selectedColor"
-      />
+    <ul class="colors colors--black">
+      <li class="colors__item"
+          v-for="color in product.colors"
+          :key="color.id"
+      >
+        <ProductColor :color="color.color"
+                      :selected-color.sync="selectedColor"
+        />
       </li>
 
     </ul>
@@ -32,16 +44,27 @@
 import ProductColor from '@/components/UI/ProductColor';
 import numberFormat from '@/helpers/numberFormat';
 import { changeImageColor } from '@/helpers/changeImageColor';
+import { mapActions } from 'vuex';
+import instance from '@/axiosConfig';
 
 export default {
-  props: ['product'],
+  props: ['product', 'perpage'],
   components: {
     ProductColor
   },
   methods: {
-    show(ev) {
-      console.log(ev)
-    }
+    ...mapActions(['addProductToBasket']),
+    addToBasket() {
+      instance.get(`products/${this.product.id}`)
+        .then(res => {
+          this.addProductToBasket({
+            productId: res.data.id,
+            colorId: res.data.colors[0].color.id,
+            sizeId: res.data.sizes[0].id,
+            quantity: 1
+          });
+        });
+    },
   },
   data() {
     return {
@@ -65,4 +88,29 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.catalog__item:hover .add-basket__btn {
+  opacity: 1;
+  transition: opacity .4s linear;
+}
+
+.catalog__pic {
+  position: relative;
+}
+
+.add-basket__btn {
+  opacity: 0;
+  position: absolute;
+  z-index: 50;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 40px;
+  border: none;
+  background-color: #e02d71;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity .4s linear;
+}
+</style>

@@ -46,6 +46,7 @@
             <ProductItem v-for="product in productsList"
                          :key="product.id"
                          :product="product"
+                         :perpage="perPage"
             />
           </ul>
 
