@@ -4,7 +4,9 @@ import MainPage from '../pages/Main';
 import Basket from '../pages/Basket';
 import Order from '../pages/Order';
 import OrderInfoPage from '../pages/OrderInfo';
-const ProductPage = () => import('@/pages/Product')
+import PageNotFound from '../pages/PageNotFound';
+
+const ProductPage = () => import('@/pages/Product');
 
 Vue.use(VueRouter);
 
@@ -18,7 +20,7 @@ const routes = [
     path: '/product/:id',
     name: 'ProductPage',
     component: ProductPage,
-    props: {imageSrc: true}
+    props: { imageSrc: true }
   },
   {
     path: '/basket',
@@ -31,15 +33,22 @@ const routes = [
     component: Order,
   },
   {
-    path: '/order/info',
+    path: '/order/info/:id',
     name: 'OrderInfoPage',
     component: OrderInfoPage
+  },
+  {
+    name: '404',
+    path: '/404',
+    component: PageNotFound
+  }, {
+    path: '*',
+    redirect: '404'
   }
-
 ];
 
 const router = new VueRouter({
-  // history: VueRouter.createWebHashHistory(),
+
   routes,
 });
 

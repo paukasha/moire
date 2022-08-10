@@ -1,8 +1,8 @@
 <template>
   <div>
     <Loader v-if="isLoading"/>
-    <RequestError v-else-if="orderRequestError"
-                  :error="orderRequestError"
+    <RequestError v-else-if="requestError"
+                  :error="requestError"
 
     />
     <div v-else>
@@ -94,7 +94,7 @@ import BasketInfoOrder from '@/components/Basket/BasketInfoOrder';
 import Breadcrumbs from '@/components/UI/Breadcrumbs';
 import Loader from '@/components/UI/Loader/Loader';
 import RequestError from '@/components/UI/RequestError';
-import instance from '@/axiosConfig';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   components: {
@@ -106,38 +106,28 @@ export default {
   data() {
     return {
       crumbs: ['Корзина', 'Информация о заказе'],
-      orderInfo: '',
-      orderRequestError: '',
-      isLoading: false
+      // orderInfo: '',
+      // orderRequestError: '',
+      // isLoading: false
     };
   },
   mounted() {
-    this.getOrderInfo();
+    console.log(this.$route.params.id);
+    this.getOrderInfo(this.$route.params.id);
+    if (this.requestError === 0) {
+      this.$router.push({ name: '404' });
+    }
+
   },
   methods: {
-    getOrderInfo() {
-      this.isLoading = true;
-      instance.get(`orders/${this.$route.params.id}`, {
-        params: {
-          orderId: this.$route.params.id
-        }
-      })
-        .then(res => {
-          this.orderInfo = res.data;
-          this.isLoading = false;
-        })
-        .catch(e => {
-          this.orderRequestError = 'При загрузке информации о заказе произошла ошибка.' +
-            'Уточнить информацию о заказе можно позвонив ' +
-            'по телефону горячей линии, ' +
-            'заказав звонок или отправив письмо на почту'
-          this.isLoading = false;
-        });
-    },
+    ...mapActions(['getOrderInfo']),
     goToPage() {
       this.$router.push({ name: 'Basket' });
     }
   },
+  computed: {
+    ...mapGetters(['orderInfo', 'isLoading', 'requestError'])
+  }
 };
 </script>
 

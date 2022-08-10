@@ -203,9 +203,13 @@ export default {
           this.isLoading = false;
         })
         .catch(e => {
-          this.requestError = 'При загрузке товара произошла ошибка';
+          if (e.response.data.error.code == '404') {
+            this.$router.push({ name: '404' });
+          } else {
+            this.requestError = 'При загрузке товара произошла ошибка';
+          }
           this.isLoading = false;
-          console.log(e);
+
         });
     },
   },

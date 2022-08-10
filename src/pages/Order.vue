@@ -34,7 +34,7 @@
               <BaseFieldText title="Телефон"
                              v-mask="'+7 (###)-###-##-##'"
                              v-model="dataForm.phone"
-                             rules="required"
+                             rules="required|min:18"
                              placeholder="Введите ваш телефон"
               />
 
@@ -141,7 +141,7 @@ import RequestError from '@/components/UI/RequestError';
 import numberFormat from '@/helpers/numberFormat';
 
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
-import { email, required } from 'vee-validate/dist/rules';
+import { email, min, required } from 'vee-validate/dist/rules';
 import { mask } from 'vue-the-mask';
 
 import { mapMutations } from 'vuex';
@@ -149,6 +149,11 @@ import { mapMutations } from 'vuex';
 extend('required', {
   ...required,
   message: 'Поле не может быть пустым'
+});
+
+extend('min', {
+  ...min,
+  message: 'Неверный формат'
 });
 
 extend('email', {

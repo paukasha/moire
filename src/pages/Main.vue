@@ -82,7 +82,7 @@ export default {
       isLoading: false,
 
       currentPage: '',
-      perPage: localStorage.getItem('perPage'),
+      perPage: '',
       pagesCount: '',
       perPageList: [3, 6, 9],
 
@@ -108,6 +108,7 @@ export default {
 
   mounted() {
     this.currentPage = this.$route.query.page || 1;
+    this.perPage = localStorage.getItem('perPage') || 3;
   },
   methods: {
     ...mapActions(['getBasket']),

@@ -1,10 +1,10 @@
 <template>
   <div>
-    <Header />
+    <Header/>
     <main class="content container">
-    <router-view />
+      <router-view/>
     </main>
-    <Footer />
+    <Footer/>
   </div>
 
 
@@ -13,29 +13,27 @@
 <script>
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
-import instance from '@/axiosConfig';
 
-import { mapActions,mapMutations } from 'vuex'
+import { mapActions, mapMutations } from 'vuex';
 
 export default {
   data() {
     return {
-      userAccessKey:''
-    }
+      userAccessKey: ''
+    };
   },
   methods: {
-    ...mapActions(['getBasket']),
+    ...mapActions(['getBasket', 'getUserAccessKey']),
     ...mapMutations(['updateUserAccessKey'])
   },
   mounted() {
-
-    const userAccessKey = localStorage.getItem('userAccessKey')
-    if (userAccessKey) {
-      this.updateUserAccessKey(userAccessKey)
+    const userAccessKey = localStorage.getItem('userAccessKey');
+    if (!userAccessKey) {
+      this.getUserAccessKey();
     }
 
-
-    this.getBasket()
+    localStorage.setItem('perPage', '3');
+    this.getBasket();
   },
   components: {
     Header,
