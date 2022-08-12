@@ -46,4 +46,8 @@ export default {
 .content {
   padding-top: 80px !important;
 }
+
+.content__top {
+  margin-top: 20px;
+}
 </style>

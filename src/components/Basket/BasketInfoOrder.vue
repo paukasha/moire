@@ -10,11 +10,13 @@
         Итого: <span>{{ totalPrice | numberFormat }} ₽</span>
       </p>
 
-      <router-link :to="{name: 'Order', path: 'order'}"
-                   class="cart__button button button--primery"
+      <button @click.prevent="$emit('redirect', $event)"
+              class="cart__button button button--primery"
+              :disabled="countError"
+              :title="invalidProductCount"
       >
         Оформить заказ
-      </router-link>
+      </button>
     </div>
 
     <div v-else>
@@ -65,7 +67,7 @@ import { declineProductDict } from '@/helpers/wordsDict';
 import { mapGetters } from 'vuex';
 
 export default {
-  props: ['delivery'],
+  props: ['delivery', 'countError'],
   computed: {
     ...mapGetters(['basketProducts', 'basketTotalPrice']),
     totalPrice() {
@@ -74,10 +76,14 @@ export default {
     declineBasketProductsAmount() {
       return wordDecline(this.basketProducts.length, declineProductDict);
     },
+    invalidProductCount() {
+      return this.countError ? 'Пожалуйста, проверьте введенные данные' : '';
+    }
   },
   filters: {
     numberFormat
   },
+
 };
 </script>
 

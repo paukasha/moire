@@ -15,7 +15,9 @@
     <div class="product__basket-info">
       <div class="product__info product__info--color">
         Цвет:
-        <ProductColor class="color" :color="product.color.color" />
+        <ProductColor class="color"
+                      :color="product.color.color"
+        />
         {{ colorsDict[product.color.color.code] }}
       </div>
 
@@ -31,11 +33,19 @@
       Артикул:  {{ product.product.id }}
     </span>
 
-    <ProductCount :product-count.sync="productCount" />
+    <ProductCount :product-count.sync="productCount"
+                  @error="error = $event"
+    />
 
-    <b class="product__price">
+    <b v-if="error"
+       class="product__price invalid__counter"
+    >{{ error }}</b>
+    <b v-else
+       class="product__price"
+    >
       {{ productTotalPrice | numberFormat }} ₽
     </b>
+
 
     <button class="product__del button-del"
             type="button"
@@ -59,7 +69,6 @@ import numberFormat from '@/helpers/numberFormat';
 import { colorsDict } from '@/helpers/wordsDict';
 import { mapActions } from 'vuex';
 
-
 export default {
   props: ['product'],
   components: {
@@ -69,6 +78,7 @@ export default {
   data() {
     return {
       productTotalPrice: '',
+      error: '',
       colorsDict
     };
   },
@@ -90,7 +100,6 @@ export default {
           productId: this.product.id,
           productAmount: val
         });
-
       }
     },
   },
@@ -100,7 +109,7 @@ export default {
 };
 </script>
 
-<style >
+<style>
 .button-del {
   cursor: pointer;
 }
@@ -120,15 +129,20 @@ export default {
   align-items: center;
 }
 
-.product__info--color  span.colors__value {
+.product__info--color span.colors__value {
   padding-left: 0 !important;
 }
 
-.product__info--color label:hover +.colors__value::before {
+.product__info--color label:hover + .colors__value::before {
   border: none;
 }
 
 .product__info--color label:hover {
   cursor: default;
+}
+
+.invalid__counter {
+  font-size: 12px;
+  color: red;
 }
 </style>

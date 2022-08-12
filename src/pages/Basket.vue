@@ -35,7 +35,7 @@
 
     <RequestError v-else-if="$store.state.Basket.requestError"
                   :error="$store.state.Basket.requestError"
-                  @load="getBasket"
+                  @load="reloadPage"
     />
 
 
@@ -43,19 +43,24 @@
              class="cart"
              :style="!basketProducts.length ? {height: '240px'} : ''"
     >
+      <ValidationObserver v-slot="{handleSubmit, invalid}">
+        <form class="cart__form form">
+          <div class="cart__field">
+            <ul class="cart__list">
+              <BasketProduct v-for="product in basketProducts"
+                             :key="product.id"
+                             :product="product"
 
-      <form class="cart__form form">
-        <div class="cart__field">
-          <ul class="cart__list">
-            <BasketProduct v-for="product in basketProducts"
-                           :key="product.id"
-                           :product="product"
-            />
-          </ul>
-        </div>
+              />
+            </ul>
+          </div>
 
-        <BasketInfoOrder/>
-      </form>
+          <BasketInfoOrder @redirect="handleSubmit(goToCheckOrder)"
+                           :count-error="invalid"
+
+          />
+        </form>
+      </ValidationObserver>
     </section>
   </div>
 </template>
@@ -70,6 +75,7 @@ import RequestError from '@/components/UI/RequestError';
 import numberFormat from '@/helpers/numberFormat';
 import wordDecline from '@/helpers/decline';
 import { declineProductDict } from '@/helpers/wordsDict';
+import { ValidationObserver } from 'vee-validate';
 
 import { mapActions, mapGetters } from 'vuex';
 
@@ -79,7 +85,8 @@ export default {
     BasketInfoOrder,
     Breadcrumbs,
     Loader,
-    RequestError
+    RequestError,
+    ValidationObserver
   },
   data() {
     return {
@@ -87,12 +94,18 @@ export default {
     };
   },
   mounted() {
-    this.getBasket()
+    this.getBasket();
   },
   methods: {
     ...mapActions(['getBasket']),
     goToCatalog() {
-      this.$router.push({name: 'MainPage'})
+      this.$router.push({ name: 'MainPage' });
+    },
+    reloadPage() {
+      this.$router.go(0);
+    },
+    goToCheckOrder(event) {
+      this.$router.push({ name: 'Order' });
     }
   },
   computed: {
@@ -100,6 +113,7 @@ export default {
     declineBasketProductsAmount() {
       return wordDecline(this.basketProducts.length, declineProductDict);
     },
+
   },
   filters: {
     numberFormat

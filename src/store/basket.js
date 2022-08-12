@@ -53,7 +53,6 @@ export default {
         }
       })
         .then(res => {
-          console.log('after res');
           context.commit('updateBasket', res.data.items);
         })
         .catch(e => {
@@ -65,10 +64,10 @@ export default {
       productId,
       productAmount
     }) {
-      if (productAmount || productId) {
+      if (productAmount && productId && typeof productAmount == 'number') {
         instance.put('baskets/products', {
           basketItemId: productId,
-          quantity: productAmount
+          quantity: Math.abs(productAmount)
         }, {
           params: {
             userAccessKey: localStorage.getItem('userAccessKey')
