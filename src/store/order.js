@@ -15,7 +15,8 @@ export default {
       context.state.isLoading = true;
       instance.get(`orders/${id}`, {
         params: {
-          orderId: id
+          orderId: id,
+          userAccessKey: localStorage.getItem('userAccessKey')
         }
       })
         .then(res => {

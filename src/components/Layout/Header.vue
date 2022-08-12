@@ -60,13 +60,18 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 
 .header {
   background-color: #fff;
   position: fixed;
-  margin: 0 60px;
   z-index: 55;
+  width: 100%;
+}
+
+.header__wrapper {
+  width: 1200px !important;
+  margin: 0 auto !important;
 }
 
 .productAdded {

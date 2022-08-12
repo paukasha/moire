@@ -86,6 +86,9 @@ export default {
       crumbs: ['Корзина'],
     };
   },
+  mounted() {
+    this.getBasket()
+  },
   methods: {
     ...mapActions(['getBasket']),
     goToCatalog() {

@@ -27,13 +27,13 @@ export default {
     ...mapMutations(['updateUserAccessKey'])
   },
   mounted() {
-    const userAccessKey = localStorage.getItem('userAccessKey');
-    if (!userAccessKey) {
+    if (!localStorage.getItem('userAccessKey')) {
       this.getUserAccessKey();
     }
 
-    localStorage.setItem('perPage', '3');
     this.getBasket();
+    localStorage.setItem('perPage', '3');
+
   },
   components: {
     Header,
@@ -43,5 +43,7 @@ export default {
 </script>
 
 <style>
-
+.content {
+  padding-top: 80px !important;
+}
 </style>

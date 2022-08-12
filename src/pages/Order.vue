@@ -241,7 +241,9 @@ export default {
         deliveryTypeId: this.selectedDelivery.id,
         paymentTypeId: this.selectedPayment.id
       });
-      instance.post('orders', dataForm,)
+      instance.post('orders', dataForm, { params: {
+          userAccessKey: localStorage.getItem('userAccessKey')
+        }})
         .then(res => {
           this.isLoading = false;
           this.$router.push({

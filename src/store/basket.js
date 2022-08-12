@@ -14,17 +14,19 @@ export default {
   }),
   actions: {
     getUserAccessKey(context) {
-      if (!context.state.userAccessKey) {
-        instance.get('/users/accessKey')
-          .then(res => {
-            localStorage.setItem('userAccessKey', res.data.accessKey);
-            context.commit('updateUserAccessKey', res.data.accessKey);
-          });
-      }
+      instance.get('/users/accessKey')
+        .then(res => {
+          localStorage.setItem('userAccessKey', res.data.accessKey);
+          context.commit('updateUserAccessKey', res.data.accessKey);
+        });
     },
     getBasket(context) {
       context.state.isLoading = true;
-      instance.get('baskets',)
+      instance.get('baskets', {
+        params: {
+          userAccessKey: localStorage.getItem('userAccessKey')
+        }
+      })
         .then(res => {
           context.state.isLoading = false;
           context.commit('updateBasket', res.data.items);
@@ -45,12 +47,18 @@ export default {
         colorId,
         sizeId,
         quantity
+      }, {
+        params: {
+          userAccessKey: localStorage.getItem('userAccessKey')
+        }
       })
         .then(res => {
+          console.log('after res');
           context.commit('updateBasket', res.data.items);
         })
         .catch(e => {
-          context.state.requestError = 'При добавлении товара в корзину произошла ошибка. Пожалуйста, обновите страницу ';
+          let error = 'При добавлении товара в корзину произошла ошибка. Пожалуйста, обновите страницу ';
+          context.commit('updateRequestError', error);
         });
     },
     updateCartProductAmount(context, {
@@ -61,18 +69,26 @@ export default {
         instance.put('baskets/products', {
           basketItemId: productId,
           quantity: productAmount
+        }, {
+          params: {
+            userAccessKey: localStorage.getItem('userAccessKey')
+          }
         })
           .then(res => {
             context.commit('updateCartProductAmount', res.data);
             context.commit('updateBasket', res.data.items);
           })
           .catch(e => {
-            context.state.requestError = 'При добавлении товара в корзину произошла ошибка. Пожалуйста, обновите страницу ';
+            let error = 'При добавлении товара в корзину произошла ошибка. Пожалуйста, обновите страницу ';
+            context.commit('updateRequestError', error);
           });
       }
     },
     deleteProduct(context, id) {
       instance.delete('baskets/products', {
+        params: {
+          userAccessKey: localStorage.getItem('userAccessKey')
+        },
         data: {
           basketItemId: id
         }
@@ -103,6 +119,9 @@ export default {
         return acc + productTotalPrice;
       }, 0) : 0;
     },
+    updateRequestError(state, error) {
+      state.requestError = error;
+    }
   },
   getters: {
     basketProducts(state, getters) {
@@ -112,9 +131,9 @@ export default {
       return state.basket.length;
     },
     allProductsQuantity(state) {
-      return state.basket.reduce((acc,nextVal) => {
-        return acc+nextVal.quantity
-      }, 0)
+      return state.basket.reduce((acc, nextVal) => {
+        return acc + nextVal.quantity;
+      }, 0);
     },
     basketTotalPrice(state, getters) {
       return getters.basketProducts ? getters.basketProducts.reduce((prevItem, nextItem) => {
@@ -122,6 +141,9 @@ export default {
 
         return prevItem + productTotalPrice2;
       }, 0) : 0;
+    },
+    requestErrors(state) {
+      return state.requestError;
     }
   },
 

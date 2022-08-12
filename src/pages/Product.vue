@@ -92,8 +92,8 @@
               </fieldset>
             </div>
 
-            <div v-if="$store.state.Basket.requestError">
-              {{ $store.state.Basket.requestError }}
+            <div v-if="requestError">
+              {{ requestError }}
             </div>
             <button v-else
                     class="item__button button button--primery"
@@ -123,7 +123,7 @@ import Breadcrumbs from '@/components/UI/Breadcrumbs';
 import Loader from '@/components/UI/Loader/Loader';
 import RequestError from '@/components/UI/RequestError';
 
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'ProductPage',
@@ -153,6 +153,7 @@ export default {
     this.getProductDetail();
   },
   computed: {
+    ...mapGetters(['requestErrors']),
     productTotalPrice() {
       return this.product.price * this.productCount;
     },
