@@ -1,5 +1,5 @@
 <template>
-  <ValidationProvider v-slot="{errors, dirty}"
+  <ValidationProvider v-slot="{errors}"
                       tag="label"
                       class="form__label"
                       :rules="rules"

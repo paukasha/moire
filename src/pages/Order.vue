@@ -129,6 +129,8 @@
 
 <script>
 import instance from '@/axiosConfig';
+import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
+import { email, min, required, } from 'vee-validate/dist/rules';
 
 import Breadcrumbs from '@/components/UI/Breadcrumbs';
 import BaseFormField from '@/components/Form/BaseFormField';
@@ -140,26 +142,9 @@ import RequestError from '@/components/UI/RequestError';
 
 import numberFormat from '@/helpers/numberFormat';
 
-import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
-import { email, min, required } from 'vee-validate/dist/rules';
 import { mask } from 'vue-the-mask';
 
 import { mapMutations } from 'vuex';
-
-extend('required', {
-  ...required,
-  message: 'Поле не может быть пустым'
-});
-
-extend('min', {
-  ...min,
-  message: 'Неверный формат'
-});
-
-extend('email', {
-  ...email,
-  message: 'Некорректный email'
-});
 
 export default {
   components: {
@@ -186,7 +171,7 @@ export default {
         address: '',
         phone: '',
         email: '',
-        comment: ''
+        comment: '',
       },
       errors: {
         deliveryError: '',
@@ -199,6 +184,20 @@ export default {
   },
   mounted() {
     this.getDeliveries();
+    extend('required', {
+      ...required,
+      message: 'Поле не может быть пустым'
+    });
+
+    extend('min', {
+      ...min,
+      message: 'Неверный формат'
+    });
+
+    extend('email', {
+      ...email,
+      message: 'Некорректный email'
+    });
   },
   methods: {
     ...mapMutations(['updateBasket']),
