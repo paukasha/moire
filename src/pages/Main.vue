@@ -42,13 +42,15 @@
         />
 
         <section class="catalog">
-          <ul class="catalog__list">
+          <ul v-if="productsList.length" class="catalog__list">
             <ProductItem v-for="product in productsList"
                          :key="product.id"
                          :product="product"
                          :perpage="perPage"
             />
           </ul>
+
+          <div v-else>К сожалению, ничего не найдено</div>
 
           <Pagination v-model="currentPage"
                       :pages-count="pagesCount"

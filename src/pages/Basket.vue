@@ -104,7 +104,7 @@ export default {
     reloadPage() {
       this.$router.go(0);
     },
-    goToCheckOrder(event) {
+    goToCheckOrder() {
       this.$router.push({ name: 'Order' });
     }
   },
