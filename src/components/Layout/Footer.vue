@@ -116,7 +116,7 @@
         </div>
         <div v-else>
 
-          <ValidationObserver v-slot="{ handleSubmit }">
+          <ValidationObserver v-slot="{ handleSubmit }" tag="div">
             <BaseFieldText title="Телефон"
                            v-mask="'+7 (###)-###-##-##'"
                            rules="required|min:18"
@@ -149,15 +149,7 @@ import { mask } from 'vue-the-mask';
 import { extend, validate, ValidationObserver } from 'vee-validate';
 import { min, required } from 'vee-validate/dist/rules';
 
-extend('min', {
-  ...min,
-  message: 'Неверный формат'
-});
 
-extend('required', {
-  ...required,
-  message: 'Это поле обязательно'
-});
 
 export default {
   components: {
@@ -176,6 +168,17 @@ export default {
       isSaleOpen: false,
     };
   },
+  mounted() {
+    extend('min', {
+      ...min,
+      message: 'Неверный формат'
+    });
+
+    extend('required', {
+      ...required,
+      message: 'Это поле обязательно'
+    });
+  },
   methods: {
     openModal(val) {
       this.isModalOpen = true;
@@ -193,11 +196,11 @@ export default {
     closeModal(e) {
       if (e.target.classList.contains('fixed-overlay')) {
         this.isModalOpen = false;
+        this.phone = '';
       }
-      this.phone = '';
     },
     sendCall() {
-      validate(this.phone, 'min:18')
+      validate(this.phone, 'required|min:18')
         .then(result => {
           if (result.valid) {
             this.isCallSend = true;

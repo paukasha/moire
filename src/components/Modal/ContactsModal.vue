@@ -20,6 +20,7 @@ export default {}
   bottom: 0;
   background: #ea73cb2b;
   position: fixed;
+  z-index: 60;
 }
 
 .modal {
