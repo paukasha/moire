@@ -69,7 +69,7 @@ export default {
           this.isPlusProduct = true;
           this.addProductToBasket({
             productId: res.data.id,
-            colorId: res.data.colors[0].color.id,
+            colorId: this.selectedColor.id,
             sizeId: res.data.sizes[0].id,
             quantity: 1
           });
