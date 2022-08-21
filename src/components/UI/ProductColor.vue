@@ -1,16 +1,16 @@
 <template>
   <label class="colors__label">
-      <input
-        class="colors__radio sr-only"
-       v-model="currentColor"
-        type="radio"
-        :value="color"
-      />
-      <span class="colors__value"
-            :style="[{backgroundColor: color.code,
+    <input
+      class="colors__radio sr-only"
+      v-model="currentColor"
+      type="radio"
+      :value="color"
+    />
+    <span class="colors__value"
+          :style="[{backgroundColor: color.code,
                           border: color.code == '#ffffff' ? '.5px solid #000' : '',}]"
-      />
-    </label>
+    />
+  </label>
 
 </template>
 
@@ -20,8 +20,9 @@ export default {
   computed: {
     currentColor: {
       get() {
-        return this.selectedColor
-      }, set(val) {
+        return this.selectedColor;
+      },
+      set(val) {
         this.$emit('update:selectedColor', val);
       }
     }
@@ -30,5 +31,7 @@ export default {
 </script>
 
 <style scoped>
-
+.product__info--color span {
+  padding-left: 0 !important;
+}
 </style>

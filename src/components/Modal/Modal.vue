@@ -1,15 +1,26 @@
 <template>
   <div class="fixed-overlay fixed-overlay__modal"
-  @click="$emit('close', $event)">
+       @click="$emit('close', $event)"
+  >
     <div class="modal">
+      <CloseButton class="closeBtn"
+                   :aria-label="'Закрыть'"
+                   @close-modal="$emit('close', $event)"
+      />
       <slot></slot>
-
     </div>
+
   </div>
 </template>
 
 <script>
-export default {}
+import CloseButton from '@/components/UI/CrossButton';
+
+export default {
+  components: {
+    CloseButton
+  },
+};
 </script>
 
 <style scoped>
@@ -34,6 +45,13 @@ export default {}
   padding: 40px;
   max-width: 600px;
   width: 100%;
+}
+
+.closeBtn {
+  position: absolute;
+  z-index: 65;
+  top: 10px;
+  right: 10px;
 }
 
 </style>

@@ -6,18 +6,21 @@
     >
       <svg width="12"
            height="12"
-           fill="currentColor">
+           fill="currentColor"
+      >
         <use xlink:href="#icon-minus"></use>
       </svg>
     </button>
 
-    <ValidationProvider v-slot="{errors, dirty}"
-                        rules="integer|positive|required"
+    <ValidationProvider rules="required|min_value:1"
+                        v-slot="{ errors, invalid, validate, dirty }"
+                        :vid="id"
     >
       <input type="text"
              v-model.number="counter"
-             name="count"
              autocomplete="off"
+             :name="'count'"
+             @input="sendError(validate($event))"
       />
     </ValidationProvider>
 
@@ -27,31 +30,47 @@
     >
       <svg width="12"
            height="12"
-           fill="currentColor">
+           fill="currentColor"
+      >
         <use xlink:href="#icon-plus"></use>
       </svg>
+
     </button>
   </div>
 </template>
 
 <script>
-import { extend, ValidationProvider } from 'vee-validate';
-import { integer, required } from 'vee-validate/dist/rules';
+import { ValidationProvider } from 'vee-validate';
 
 export default {
-  props: ['productCount'],
+
+  props: ['productCount', 'id'],
   components: {
     ValidationProvider
   },
   data() {
     return {
-      counter: ''
+      counter: '',
+      dict: {
+        ru: {
+          messages: {
+            required: () => 'Поле является обязательным',
+            min_value: () => 'Значение должно быть целым положительным числом и больше нуля',
+          }
+        }
+      }
     };
   },
   mounted() {
     this.counter = this.productCount;
+
   },
   methods: {
+    sendError(er) {
+      er.then(res => {
+        this.$emit('catch-error', res);
+      });
+    },
     incrementProductCount() {
       this.counter = +this.counter + 1;
     },
@@ -63,34 +82,12 @@ export default {
   watch: {
     counter(value) {
       this.$emit('update:productCount', value);
-
-      extend('positive', value => {
-        if (value > 0) {
-          this.$emit('error', '');
-          return true;
-        }
-        this.$emit('error', 'Значение должно быть больше нуля');
-      });
-
-      extend('integer', {
-        ...integer,
-        message: () => {
-          this.$emit('error', 'Введите число');
-        }
-      });
-
-      extend('required', {
-        ...required,
-        message: () => {
-          this.$emit('error', 'Хорош баловаться! Поле является обязательным');
-        }
-      });
     }
   },
 };
 </script>
-
 <style scoped>
+
 input[name='count'] {
   outline: none;
 }

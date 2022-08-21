@@ -1,6 +1,9 @@
 <template>
   <li class="catalog__item">
-
+    <div class="request-error"
+         v-if="requestError"
+    >{{ requestError }}
+    </div>
     <router-link
       :to="{ name: 'ProductPage', params: { id: product.id } }"
       class="catalog__pic"
@@ -11,11 +14,17 @@
            :alt="product.title"
            :style="perpage == 9 ? {height: '100%'} : ''"
       />
+
       <button class="add-basket__btn"
               type="button"
               @click.prevent="addToBasket"
+              v-if="!requestError"
       >В корзину
       </button>
+      <div class="plus-product"
+           :class="{'is-plus-product': isPlusProduct }"
+      >+1
+      </div>
     </router-link>
 
     <h3 class="catalog__title">
@@ -57,18 +66,30 @@ export default {
     addToBasket() {
       instance.get(`products/${this.product.id}`)
         .then(res => {
+          this.isPlusProduct = true;
           this.addProductToBasket({
             productId: res.data.id,
             colorId: res.data.colors[0].color.id,
             sizeId: res.data.sizes[0].id,
             quantity: 1
           });
+
+          clearTimeout(this.productAdd);
+          this.productAdd = setInterval(() => {
+            this.isPlusProduct = false;
+          }, 2000);
+        })
+        .catch(e => {
+          this.isPlusProduct = false;
+          this.requestError = 'При добавлении товара произошла ошибка. Обновите, пожалуйста, страницу';
         });
     },
   },
   data() {
     return {
       selectedColor: '',
+      isPlusProduct: false,
+      requestError: ''
     };
   },
   mounted() {
@@ -89,6 +110,10 @@ export default {
 </script>
 
 <style scoped>
+.catalog__item {
+  position: relative;
+}
+
 .catalog__item:hover .add-basket__btn {
   opacity: 1;
   transition: opacity .4s linear;
@@ -112,5 +137,37 @@ export default {
   font-size: 16px;
   cursor: pointer;
   transition: opacity .4s linear;
+}
+
+.plus-product {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  font-weight: bold;
+  font-size: 22px;
+  opacity: 0;
+  color: #e02d71;
+}
+
+.is-plus-product {
+  animation: plus-product 1s ease-in-out;
+}
+
+@keyframes plus-product {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(-160px);
+  }
+}
+
+.request-error {
+  text-align: center;
+  position: absolute;
+  top: 0;
+  z-index: 50;
 }
 </style>

@@ -18,6 +18,7 @@ export default {
         .then(res => {
           localStorage.setItem('userAccessKey', res.data.accessKey);
           context.commit('updateUserAccessKey', res.data.accessKey);
+          return res.data.accessKey;
         });
     },
     getBasket(context) {
@@ -31,7 +32,7 @@ export default {
           context.state.isLoading = false;
           context.commit('updateBasket', res.data.items);
         })
-        .catch(e => {
+        .catch(() => {
           context.state.isLoading = false;
           context.state.requestError = 'При загрузке корзины произошла ошибка';
         });
@@ -42,7 +43,7 @@ export default {
       sizeId,
       quantity
     }) {
-      instance.post('baskets/products', {
+      return instance.post('baskets/products', {
         productId,
         colorId,
         sizeId,
@@ -54,10 +55,10 @@ export default {
       })
         .then(res => {
           context.commit('updateBasket', res.data.items);
+          return res;
         })
         .catch(e => {
-          let error = 'При добавлении товара в корзину произошла ошибка. Пожалуйста, обновите страницу ';
-          context.commit('updateRequestError', error);
+          throw e;
         });
     },
     updateCartProductAmount(context, {
@@ -77,7 +78,7 @@ export default {
             context.commit('updateCartProductAmount', res.data);
             context.commit('updateBasket', res.data.items);
           })
-          .catch(e => {
+          .catch(() => {
             let error = 'При добавлении товара в корзину произошла ошибка. Пожалуйста, обновите страницу ';
             context.commit('updateRequestError', error);
           });
@@ -123,10 +124,10 @@ export default {
     }
   },
   getters: {
-    basketProducts(state, getters) {
+    basketProducts(state) {
       return state.basket;
     },
-    productsQuantity(state, getters) {
+    productsQuantity(state) {
       return state.basket.length;
     },
     allProductsQuantity(state) {

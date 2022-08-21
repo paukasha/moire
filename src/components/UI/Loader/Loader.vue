@@ -17,6 +17,7 @@ export default {};
   display: flex;
   align-items: center;
   max-width: 220px;
+  margin-top: 26px;
 }
 
 .load-text {

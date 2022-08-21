@@ -12,24 +12,30 @@
         <img src="img/svg/logo-moire.svg"
              alt="Логотип интернет магазина Moire"
              width="116"
-             height="34">
+             height="34"
+        >
       </router-link>
 
       <a class="header__tel"
-         href="tel:8 800 600 90 09">
+         href="tel:8 800 600 90 09"
+      >
         8 800 600 90 09
       </a>
 
       <router-link :to="{name: 'Basket', path:'/basket'}"
                    class="header__cart"
-                   aria-label="Корзина с товарами">
+                   aria-label="Корзина с товарами"
+      >
         <svg width="19"
-             height="24">
+             height="24"
+        >
           <use xlink:href="#icon-cart"></use>
         </svg>
         <span class="header__count"
-              :class="{'productAdded': isProductAddToCart }" ref="cartIndicator"
-              aria-label="Количество товаров">{{ productsQuantity }}</span>
+              :class="{'productAdded': isProductAddToCart }"
+              ref="cartIndicator"
+              aria-label="Количество товаров"
+        >{{ productsQuantity }}</span>
       </router-link>
     </div>
   </header>
@@ -42,16 +48,16 @@ export default {
   data() {
     return {
       isProductAddToCart: false
-    }
+    };
   },
   watch: {
-    allProductsQuantity(val) {
-      this.isProductAddToCart = true
+    allProductsQuantity() {
+      this.isProductAddToCart = true;
 
-      clearTimeout(this.productAdd)
+      clearTimeout(this.productAdd);
       this.productAdd = setInterval(() => {
-         this.isProductAddToCart= false
-      },400)
+        this.isProductAddToCart = false;
+      }, 400);
     }
   },
   computed: {
@@ -61,7 +67,6 @@ export default {
 </script>
 
 <style>
-
 .header {
   background-color: #fff;
   position: fixed;
@@ -88,7 +93,7 @@ export default {
     height: 20px;
   }
 
-  100%{
+  100% {
     width: 13px;
     height: 13px;
   }

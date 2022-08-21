@@ -8,7 +8,8 @@
       >
         <svg width="8"
              height="14"
-             fill="currentColor">
+             fill="currentColor"
+        >
           <use xlink:href="#icon-arrow-left"/>
         </svg>
       </a>
@@ -34,7 +35,8 @@
       >
         <svg width="8"
              height="14"
-             fill="currentColor">
+             fill="currentColor"
+        >
           <use xlink:href="#icon-arrow-right"/>
         </svg>
       </a>

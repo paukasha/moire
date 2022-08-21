@@ -1,28 +1,25 @@
 <template>
   <div class="cart__block"
-       v-if="basketProducts.length"
+       v-if="products.length"
   >
-    <div v-if="$route.name == 'Basket'">
-      <p class="cart__desc">
-        Мы&nbsp;посчитаем стоимость доставки на&nbsp;следующем этапе
-      </p>
-      <p class="cart__price">
-        Итого: <span>{{ totalPrice | numberFormat }} ₽</span>
-      </p>
+    <div v-if="$route.name == 'Basket' ">
+      <div>
+        <p class="cart__desc">
+          Мы&nbsp;посчитаем стоимость доставки на&nbsp;следующем этапе
+        </p>
+        <p class="cart__price">
+          Итого: <span>{{ totalPrice | numberFormat }} ₽</span>
+        </p>
 
-      <button @click.prevent="$emit('redirect', $event)"
-              class="cart__button button button--primery"
-              :disabled="countError"
-              :title="invalidProductCount"
-      >
-        Оформить заказ
-      </button>
+        <slot></slot>
+      </div>
+
     </div>
 
     <div v-else>
       <ul class="cart__orders">
         <li class="cart__order"
-            v-for="product in basketProducts"
+            v-for="product in products"
         >
           <h3>
             {{ product.product.title }}
@@ -44,7 +41,7 @@
         <p>
           Итого:
           <b>
-            {{ basketProducts.length }}
+            {{ products.length }}
           </b>
           {{ declineBasketProductsAmount }} на сумму
           <b>
@@ -64,17 +61,21 @@ import numberFormat from '@/helpers/numberFormat';
 import wordDecline from '@/helpers/decline';
 import { declineProductDict } from '@/helpers/wordsDict';
 
-import { mapGetters } from 'vuex';
-
 export default {
-  props: ['delivery', 'countError'],
+  props: ['delivery', 'countError', 'products'],
   computed: {
-    ...mapGetters(['basketProducts', 'basketTotalPrice']),
+
     totalPrice() {
-      return this.delivery ? ((+this.basketTotalPrice) + (Number(this.delivery.price))) : (+this.basketTotalPrice);
+      let productsTotalPrice = this.products.length ? this.products.reduce((prevItem, nextItem) => {
+        let productTotalPrice1 = +nextItem.price * (+nextItem.quantity);
+
+        return prevItem + productTotalPrice1;
+      }, 0) : 0;
+
+      return this.delivery ? ((+productsTotalPrice) + (Number(this.delivery.price))) : (+productsTotalPrice);
     },
     declineBasketProductsAmount() {
-      return wordDecline(this.basketProducts.length, declineProductDict);
+      return wordDecline(this.products.length, declineProductDict);
     },
     invalidProductCount() {
       return this.countError ? 'Пожалуйста, проверьте введенные данные' : '';
@@ -88,7 +89,4 @@ export default {
 </script>
 
 <style scoped>
-.cart__button {
-  text-align: center;
-}
 </style>

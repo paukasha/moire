@@ -167,7 +167,6 @@ export default {
 
       axios.all(endpoints.map((endpoint) => instance.get(endpoint)))
         .then(
-
           axios.spread(({ data: productCategories }, { data: materials }, { data: seasons }) => {
             this.categories = productCategories.items;
             this.materials = materials.items;

@@ -3,14 +3,17 @@
     <li class="breadcrumbs__item">
       <router-link to="/"
                    class="breadcrumbs__link"
-                   href="index.html">
+                   href="index.html"
+      >
         Каталог
       </router-link>
     </li>
     <li class="breadcrumbs__item"
-        v-for="crumb in crumbs">
+        v-for="crumb in crumbs"
+    >
       <a class="breadcrumbs__link"
-         @click.prevent="selectedCrumb(crumb)">
+         @click.prevent="selectedCrumb(crumb)"
+      >
         {{ crumb }}
       </a>
     </li>

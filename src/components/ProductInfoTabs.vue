@@ -2,14 +2,15 @@
   <div class="item__desc">
     <ul class="tabs">
       <li class="tabs__item"
-          v-for="tab in tabs"
+          v-for="tab in productInfoTabsList"
           :key="tab.id"
       >
         <a class="tabs__link"
            @click.prevent="currentTab = tab"
            :class="{'tabs__link--current': currentTab == tab }"
         >
-          {{ tab.title }} </a>
+          {{ tab.title }}
+        </a>
       </li>
     </ul>
 
@@ -29,8 +30,8 @@
       </span>
 
       <h3>Категория:</h3>
-      <span v-if="productInfo.category.title">
-        {{ productInfo.category.title }}
+      <span v-if="categoryTitle">
+        {{ categoryTitle }}
       </span>
     </div>
 
@@ -61,26 +62,24 @@
 
 <script>
 
+import { productInfoTabsList } from '@/helpers/listsDictionary';
+
 export default {
   props: ['productInfo'],
   data() {
     return {
       currentTab: '',
-      tabs: [{
-        id: 1,
-        title: 'Информация о товаре',
-        content: ''
-      }, {
-        id: 2,
-        title: 'Доставка и возврат'
-      }],
-      // productInfo: ''
+      productInfoTabsList
     };
   },
   mounted() {
-    this.currentTab = this.tabs[0];
-    // this.productInfo = this.infoProduct;
+    this.currentTab = this.productInfoTabsList[0];
   },
+  computed: {
+    categoryTitle() {
+      return this.productInfo.category ? this.productInfo.category.title : '';
+    }
+  }
 };
 </script>
 

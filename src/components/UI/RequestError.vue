@@ -1,17 +1,18 @@
 <template>
-  <div>
-    <span>{{ error }} </span>
+  <div class="loadError">
+    <span>{{ error }}</span>
     <button class="request-error__btn"
-    type="button"
-    @click.prevent="$emit('load')">
-      Попробовать обновить
+            type="button"
+            @click.prevent="$emit('load')"
+    >
+      {{ btnText }}
     </button>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['error']
+  props: ['error', 'btnText']
 };
 </script>
 
@@ -24,5 +25,13 @@ export default {
   font-size: 20px;
   color: #e02d71;
   cursor: pointer;
+}
+
+.loadError {
+  margin-bottom: 20px;
+}
+
+.loadError {
+  white-space: pre-line;
 }
 </style>

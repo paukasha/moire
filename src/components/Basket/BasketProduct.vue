@@ -1,7 +1,8 @@
 <template>
-  <li class="cart__item product"
-  >
-    <div class="product__pic">
+  <li class="cart__item product">
+    <div class="product__pic"
+         @click="goToProductPage"
+    >
       <img :src="product.color.gallery[0].file.url"
            width="120"
            height="120"
@@ -34,18 +35,20 @@
     </span>
 
     <ProductCount :product-count.sync="productCount"
-                  @error="error = $event"
+                  :id="product.product.id"
+                  @catch-error="errorCounter = $event"
     />
 
-    <b v-if="error"
-       class="product__price invalid__counter"
-    >{{ error }}</b>
+    <b v-if="errorCounter.errors.length">
+      <b class="product__price invalid__counter"
+      >{{ errorCounter.errors[0] }}</b>
+    </b>
+
     <b v-else
        class="product__price"
     >
       {{ productTotalPrice | numberFormat }} ₽
     </b>
-
 
     <button class="product__del button-del"
             type="button"
@@ -66,27 +69,36 @@
 import ProductCount from '@/components/UI/ProductCounter';
 import ProductColor from '@/components/UI/ProductColor';
 import numberFormat from '@/helpers/numberFormat';
+
 import { colorsDict } from '@/helpers/wordsDict';
+
 import { mapActions } from 'vuex';
+import { ValidationProvider } from 'vee-validate';
 
 export default {
   props: ['product'],
   components: {
     ProductCount,
-    ProductColor
+    ProductColor,
+    ValidationProvider
   },
   data() {
     return {
       productTotalPrice: '',
-      error: '',
+      errorCounter: { errors: [] },
       colorsDict
     };
   },
   methods: {
     ...mapActions(['updateCartProductAmount', 'deleteProduct']),
-
     deleteBasketProduct() {
       this.$store.dispatch('deleteProduct', this.product.id);
+    },
+    goToProductPage() {
+      this.$router.push({
+        name: 'ProductPage',
+        params: { id: this.product.product.id }
+      });
     }
   },
   computed: {
@@ -96,6 +108,7 @@ export default {
       },
       set(val) {
         this.productTotalPrice = val * this.product.price;
+
         this.$store.dispatch('updateCartProductAmount', {
           productId: this.product.id,
           productAmount: val
@@ -103,13 +116,21 @@ export default {
       }
     },
   },
+  watch: {
+    errorCounter: {
+      handler(val) {
+        this.$emit('emit-error-counter', val.errors[0] ? val.errors[0] : '');
+      },
+      deep: true
+    }
+  },
   filters: {
     numberFormat
   }
 };
 </script>
 
-<style>
+<style scoped>
 .button-del {
   cursor: pointer;
 }
@@ -144,5 +165,9 @@ export default {
 .invalid__counter {
   font-size: 12px;
   color: red;
+}
+
+.product__pic {
+  cursor: pointer;
 }
 </style>

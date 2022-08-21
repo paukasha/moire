@@ -2,44 +2,32 @@
   <footer class="footer container">
     <div class="footer__wrapper">
       <ul class="footer__links">
-        <li>
-          <router-link :to="{name: 'MainPage', path: '/'}"
+        <li v-for="link in footerNav"
+            :key="link.id"
+        >
+          <router-link v-if="link.id === 1"
+                       :to="link.href"
                        class="footer__link"
           >
-            Каталог
+            {{ link.title }}
           </router-link>
-        </li>
-        <li>
+
           <a class="footer__link"
-             href="tel:88006009009"
-             :class="{'orderInfoError' : orderInfoError }"
+             v-else-if="link.id === 2 || link.id === 3"
+             :class="{'orderInfoError' : requestError }"
+             @click="updateRequestError('')"
+             :href="link.href"
           >
-            8 800 600 90 09
-          </a>
-        </li>
-        <li>
-          <a class="footer__link"
-             :class="{'orderInfoError' : orderInfoError }"
-             href="mailto:hi@technozavrrr.com"
-          >
-            hi@technozavrrr.com
-          </a>
-        </li>
-        <li>
-          <a class="footer__link"
-             @click.prevent="openModal('isSaleOpen')"
-          >
-            Распродажа
-          </a>
-        </li>
-        <li>
-          <a class="footer__link footer__link--medium "
-             :class="{'orderInfoError' : orderInfoError }"
-             @click.prevent="openModal('isCallOpen')"
-          >
-            Заказать звонок
+            {{ link.title }}
           </a>
 
+          <a v-else
+             class="footer__link"
+             :class="{'orderInfoError' : requestError && link.id === 5 }"
+             @click.prevent="openModal(link.id)"
+          >
+            {{ link.title }}
+          </a>
         </li>
       </ul>
 
@@ -81,24 +69,24 @@
 
       <ul class="footer__data">
         <li>
-          <a class="footer__link"
-             href="#"
-             target="_blank"
-             rel="noopener"
-             type="application/pdf"
+          <router-link class="footer__link"
+                       to="/privacy"
+                       target="_blank"
+                       rel="noopener"
+                       type="application/pdf"
           >
             Политика конфиденциальности
-          </a>
+          </router-link>
         </li>
         <li>
-          <a class="footer__link"
-             href="#"
-             target="_blank"
-             rel="noopener"
-             type="application/pdf"
+          <router-link class="footer__link"
+                       to="public_offer"
+                       target="_blank"
+                       rel="noopener"
+                       type="application/pdf"
           >
             Публичная оферта
-          </a>
+          </router-link>
         </li>
       </ul>
 
@@ -108,55 +96,79 @@
     </div>
 
     <ContactsModal v-if="isModalOpen"
-                   @close="closeModal"
+                   @close="closeModal($event)"
     >
-      <div v-if="isCallOpen">
-        <div v-if="isCallSend">Спасибо за заявку! Наши специалисты свяжутся
-          с&nbsp;вами в течение 10 минут
+      <div>
+        <div v-if="selectedFooterNav === 4">
+          Невероятная распродажа футблок! При покупке двух футболок третья в подарок!
         </div>
-        <div v-else>
 
-          <ValidationObserver v-slot="{ handleSubmit }" tag="div">
-            <BaseFieldText title="Телефон"
-                           v-mask="'+7 (###)-###-##-##'"
-                           rules="required|min:18"
-                           v-model="phone"
-                           placeholder="Введите ваш телефон"
+        <div v-if="selectedFooterNav === 5">
+          <div v-if="isCallSend">Спасибо за заявку! Наши специалисты свяжутся
+            с&nbsp;вами в течение 10 минут
+          </div>
+
+          <div v-else>
+            <ValidationObserver v-slot="{invalid, validate}">
+              <form>
+                <BaseFieldText title="Телефон"
+                               v-mask="'+7 (###)-###-##-##'"
+                               v-model="phone"
+                               rules="required|min:18"
+                               placeholder="Введите ваш телефон"
+                />
+                <button class="cart__button button button--primery"
+                        type="button"
+                        @click.prevent="validate().then(sendCall)"
+                        :disabled="invalid"
+                >
+                  Заказать звонок
+                </button>
+              </form>
+            </ValidationObserver>
+          </div>
+        </div>
+
+        <div v-if="selectedFooterNav === 6">
+          <RequestError v-if="requestError"
+                        :error="requestError"
+          />
+          <ValidationObserver v-slot="{invalid, validate}">
+            <BaseFieldText title="Номер заказа"
+                           v-model="orderId"
+                           rules="required|numeric"
+                           placeholder="Введите номер заказа"
             />
             <button class="cart__button button button--primery"
                     type="button"
-                    @click.prevent="handleSubmit(sendCall)"
+                    :disabled="invalid"
+                    @click.prevent="validate().then(showOrderInfo)"
             >
-              Заказать звонок
+              Получить информацию о заказе
             </button>
           </ValidationObserver>
         </div>
       </div>
-
-      <div v-if="isSaleOpen">
-        Невероятная распродажа футблок! При покупке двух футболок третья в подарок!
-      </div>
-
 
     </ContactsModal>
   </footer>
 </template>
 
 <script>
-import ContactsModal from '@/components/Modal/ContactsModal';
+import ContactsModal from '@/components/Modal/Modal';
 import BaseFieldText from '@/components/Form/BaseFieldText';
+import RequestError from '@/components/UI/RequestError';
+import { ValidationObserver } from 'vee-validate';
 import { mask } from 'vue-the-mask';
-import { extend, validate, ValidationObserver } from 'vee-validate';
-import { min, required } from 'vee-validate/dist/rules';
-
-
+import { mapActions, mapGetters, mapMutations } from 'vuex';
+import { footerNav } from '@/helpers/listsDictionary';
 
 export default {
   components: {
     ContactsModal,
     BaseFieldText,
-    ValidationObserver
-
+    ValidationObserver,
+    RequestError
   },
   directives: { mask },
   data() {
@@ -164,60 +176,79 @@ export default {
       isModalOpen: false,
       isCallSend: false,
       phone: '',
-      isCallOpen: false,
-      isSaleOpen: false,
+      orderId: '',
+      footerNav,
+      selectedFooterNav: '',
+      isLoading: false,
     };
   },
   mounted() {
-    extend('min', {
-      ...min,
-      message: 'Неверный формат'
-    });
-
-    extend('required', {
-      ...required,
-      message: 'Это поле обязательно'
-    });
+    document.addEventListener('click', (event) => this.resetOrderError(event));
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', (event) => this.resetOrderError(event));
   },
   methods: {
+    ...mapActions('Order', ['getOrderInfo']),
+    ...mapMutations('Order', ['updateRequestError']),
     openModal(val) {
       this.isModalOpen = true;
-
-      if (val == 'isSaleOpen') {
-        this.isSaleOpen = true;
-        this.isCallOpen = false;
-      }
-
-      if (val == 'isCallOpen') {
-        this.isCallOpen = true;
-        this.isSaleOpen = false;
-      }
+      this.selectedFooterNav = val;
+      this.orderId = '';
+      this.updateRequestError('');
     },
     closeModal(e) {
-      if (e.target.classList.contains('fixed-overlay')) {
+      if (e.target.classList.contains('fixed-overlay') || e.target.closest('.closeBtn')) {
+        e.stopPropagation();
         this.isModalOpen = false;
         this.phone = '';
+        this.orderId = '';
       }
     },
     sendCall() {
-      validate(this.phone, 'required|min:18')
-        .then(result => {
-          if (result.valid) {
-            this.isCallSend = true;
-            setTimeout(() => {
-              this.isModalOpen = false;
-              this.isCallSend = false;
-              this.phone = '';
-            }, 5000);
-          }
+      this.isCallSend = true;
+    },
+    showOrderInfo() {
+      this.isLoading = true;
+      this.getOrderInfo(this.orderId)
+        .then(res => {
+          this.isLoading = false;
+          this.isModalOpen = false;
+
+          this.updateRequestError('');
+
+          this.$router.push({
+            name: 'OrderInfoPage',
+            params: { id: res.data.id }
+          })
+            .catch(e => {
+            });
+        })
+        .catch(() => {
+          this.isLoading = false;
+          let error = 'При загрузке информации о заказе произошла ошибка.' + '\n' +
+            'Возможно вы ввели неверный номер заказа. ' + '\n' +
+            'Уточнить информацию о заказе можно позвонив ' + '\n' +
+            'по телефону горячей линии, ' +
+            'заказав звонок или отправив письмо на электронную почту. ';
+          this.updateRequestError(error);
         });
+    },
+    resetOrderError(event) {
+      let modalContainer = document.querySelector('.fixed-overlay');
+      if (!modalContainer) {
+        this.updateRequestError('');
+      } else if (modalContainer.contains(event.target) || event.target.closest('.closeBtn')) {
+        this.closeModal(event);
+      }
     }
   },
   computed: {
+    ...mapGetters('Order', ['requestError']),
     orderInfoError() {
       return this.$store.state.Order.requestError && this.$route.name == 'OrderInfoPage';
     },
-  }
+  },
 };
 </script>
 
@@ -238,7 +269,6 @@ export default {
   }
   100% {
     border: 2px solid #e02d71;
-
   }
 }
 </style>

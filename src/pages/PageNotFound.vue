@@ -4,9 +4,7 @@
       Поищите, пожалуйста, другую!
     </h4>
 
-    <h2>или вместо поиска страниц вы можете поискать подходящий
-      товар в нашем магазине.
-      У нас есть всё! </h2>
+    <h2>или </h2>
 
     <button class="cart__button button button--primery"
             type="button"
@@ -18,9 +16,13 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
+
 export default {
   methods: {
+    ...mapMutations('Order', ['updateRequestError']),
     goToCatalog() {
+      this.updateRequestError('');
       this.$router.push({ name: 'MainPage' });
     }
   }
@@ -32,7 +34,7 @@ export default {
   display: block;
   margin: 0 auto;
   max-width: 400px;
-  animation: btn-animation  infinite 5s linear;
+  animation: btn-animation infinite 5s linear;
 }
 
 .pageNotFound {

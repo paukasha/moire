@@ -1,72 +1,74 @@
 <template>
   <div>
-    <div>
-      <div class="content__top">
-        <div class="content__row">
-          <h1 class="content__title">
-            Каталог
-          </h1>
+    <div class="content__top">
+      <div class="content__row">
+        <h1 class="content__title">
+          Каталог
+        </h1>
 
-          <div class="totalInfo">
-            <div>
-                  <span class="content__info">
-                    Найдено <b>{{ productsCount }}
-                </b> {{ productDecline }} </span>
-            </div>
+        <div class="totalInfo">
+          <div>
+              <span class="content__info">
+                Найдено
+                <b>{{ productsCount }}</b>
+                {{ productDecline }}
+              </span>
+          </div>
 
-            <div>
-              <span class="content__info">Показывать по </span>
-              <span v-for="length in perPageList"
-                    class="perPage"
-                    :key="length"
-                    @click="perPage = length"
-                    :class="{'currentPerPage': perPage == length }"
-              >{{ length }}&nbsp;</span>
-            </div>
+          <div>
+            <span class="content__info">Показывать по </span>
+            <span v-for="length in perPageList"
+                  class="perPage"
+                  :key="length"
+                  @click="perPage = length"
+                  :class="{'currentPerPage': perPage == length }"
+            >{{ length }}&nbsp;
+              </span>
           </div>
         </div>
       </div>
+    </div>
 
-      <Loader v-if="isLoading"/>
-      <RequestError v-else-if="requestError"
-                    :error="requestError"
-                    @load="getProducts"
+    <Loader v-if="isLoading"/>
+    <RequestError v-else-if="requestError"
+                  :btn-text="'Обновить страницу'"
+                  :error="requestError"
+                  @load="getProducts"
+    />
+
+    <div v-else
+         class="content__catalog"
+    >
+      <Filters :selected-filter-data.sync="selectedFilterData"
+               @update-data="selectedFilterData = $event"
       />
 
-      <div v-else
-           class="content__catalog"
-      >
-
-        <Filters :selected-filter-data.sync="selectedFilterData"
-                 @update-data="selectedFilterData = $event"
-        />
-
-        <section class="catalog">
-          <ul v-if="productsList.length" class="catalog__list">
-            <ProductItem v-for="product in productsList"
-                         :key="product.id"
-                         :product="product"
-                         :perpage="perPage"
-            />
-          </ul>
-
-          <div v-else>К сожалению, ничего не найдено</div>
-
-          <Pagination v-model="currentPage"
-                      :pages-count="pagesCount"
-                      :current-page="currentPage"
-                      :products-count="productsCount"
+      <section class="catalog">
+        <ul v-if="productsList.length"
+            class="catalog__list"
+        >
+          <ProductItem v-for="product in productsList"
+                       :key="product.id"
+                       :product="product"
+                       :perpage="perPage"
           />
+        </ul>
 
-        </section>
-      </div>
+        <div v-else>К сожалению, ничего не найдено</div>
+
+        <Pagination v-model="currentPage"
+                    :pages-count="pagesCount"
+                    :current-page="currentPage"
+                    :products-count="productsCount"
+        />
+      </section>
     </div>
   </div>
-
 </template>
 
 <script>
 import instance from '@/axiosConfig';
+
 import ProductItem from '@/components/ProductItem';
 import Pagination from '@/components/UI/Pagination';
 import Filters from '@/components/Filters';
@@ -139,9 +141,9 @@ export default {
           this.productsCount = res.data.pagination.total;
           this.pagesCount = res.data.pagination.pages;
         })
-        .catch(e => {
+        .catch(() => {
           this.isLoading = false;
-          this.requestError = 'При загрузке произошла ошибка';
+          this.requestError = 'При загрузке товаров произошла ошибка';
         });
     }
   },
@@ -151,7 +153,7 @@ export default {
     }
   },
   watch: {
-    currentPage(val) {
+    currentPage() {
       this.getProducts();
     },
     selectedFilterData() {

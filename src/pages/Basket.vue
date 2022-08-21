@@ -27,7 +27,6 @@
             Перейти в каталог
           </button>
         </div>
-
       </div>
     </div>
 
@@ -38,29 +37,38 @@
                   @load="reloadPage"
     />
 
-
     <section v-else
              class="cart"
              :style="!basketProducts.length ? {height: '240px'} : ''"
     >
-      <ValidationObserver v-slot="{handleSubmit, invalid}">
-        <form class="cart__form form">
-          <div class="cart__field">
-            <ul class="cart__list">
-              <BasketProduct v-for="product in basketProducts"
-                             :key="product.id"
-                             :product="product"
 
-              />
-            </ul>
-          </div>
-
-          <BasketInfoOrder @redirect="handleSubmit(goToCheckOrder)"
-                           :count-error="invalid"
-
+      <div class="cart__field">
+        <ul class="cart__list">
+          <BasketProduct
+            v-for="product in basketProducts"
+            :key="product.id"
+            :product="product"
+            @emit-error-counter="errorCounter = $event"
           />
-        </form>
-      </ValidationObserver>
+        </ul>
+      </div>
+
+      <BasketInfoOrder :products="basketProducts">
+        <button class="cart__button button button--primery"
+                :disabled="errorCounter != ''"
+                @click.prevent="goToCheckOrder"
+        >
+          Оформить заказ
+        </button>
+
+        <button @click.prevent="resetBasket"
+                type="button"
+                class="cart__button  button--reset"
+        >
+          Очистить корзину
+        </button>
+      </BasketInfoOrder>
+
     </section>
   </div>
 </template>
@@ -75,9 +83,9 @@ import RequestError from '@/components/UI/RequestError';
 import numberFormat from '@/helpers/numberFormat';
 import wordDecline from '@/helpers/decline';
 import { declineProductDict } from '@/helpers/wordsDict';
-import { ValidationObserver } from 'vee-validate';
 
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
+import { ValidationObserver, ValidationProvider } from 'vee-validate';
 
 export default {
   components: {
@@ -86,18 +94,18 @@ export default {
     Breadcrumbs,
     Loader,
     RequestError,
+    ValidationProvider,
     ValidationObserver
   },
   data() {
     return {
       crumbs: ['Корзина'],
+      errorCounter: ''
     };
   },
-  mounted() {
-    this.getBasket();
-  },
   methods: {
-    ...mapActions(['getBasket']),
+    ...mapActions(['getBasket', 'getUserAccessKey']),
+    ...mapMutations(['updateBasket']),
     goToCatalog() {
       this.$router.push({ name: 'MainPage' });
     },
@@ -106,6 +114,10 @@ export default {
     },
     goToCheckOrder() {
       this.$router.push({ name: 'Order' });
+    },
+    resetBasket() {
+      this.getUserAccessKey();
+      this.$store.commit('updateBasket', []);
     }
   },
   computed: {
@@ -113,7 +125,6 @@ export default {
     declineBasketProductsAmount() {
       return wordDecline(this.basketProducts.length, declineProductDict);
     },
-
   },
   filters: {
     numberFormat
@@ -124,6 +135,12 @@ export default {
 <style scoped>
 .cart__button {
   text-align: center;
+}
+
+.cart {
+  display: grid;
+  grid-template-columns: 1fr 344px;
+  gap: 60px;
 }
 
 .empty-basket {
@@ -150,5 +167,13 @@ export default {
 .empty-basket__btn:hover {
   box-shadow: 2px 2px 6px #e02d7170;
   transition: box-shadow .3s linear;
+}
+
+.button--reset {
+  border: none;
+  outline: none;
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
 }
 </style>

@@ -1,10 +1,6 @@
 <template>
   <div>
     <Loader v-if="isLoading"/>
-    <RequestError v-else-if="requestError"
-                  :error="requestError"
-
-    />
     <div v-else>
       <div class="content__top">
         <Breadcrumbs :crumbs="crumbs"
@@ -81,7 +77,9 @@
             </ul>
           </div>
 
-          <BasketInfoOrder :delivery="orderInfo.deliveryType"/>
+          <BasketInfoOrder :products="orderInfoBasket"
+                           :delivery="orderInfo.deliveryType"
+          />
         </form>
       </section>
     </div>
@@ -94,7 +92,7 @@ import BasketInfoOrder from '@/components/Basket/BasketInfoOrder';
 import Breadcrumbs from '@/components/UI/Breadcrumbs';
 import Loader from '@/components/UI/Loader/Loader';
 import RequestError from '@/components/UI/RequestError';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 
 export default {
   components: {
@@ -106,24 +104,38 @@ export default {
   data() {
     return {
       crumbs: ['Корзина', 'Информация о заказе'],
-
+      isLoading: false
     };
   },
   mounted() {
-    this.getOrderInfo(this.$route.params.id);
-    if (this.requestError === 0) {
-      this.$router.push({ name: '404' });
+    if (!this.orderInfo) {
+      this.isLoading = true;
+      this.getOrderInfo(this.$route.params.id)
+        .then(res => {
+          this.isLoading = false;
+          this.updateOrderInfo(res.data);
+        })
+        .catch(() => {
+          this.isLoading = false;
+          this.$router.push({ name: '404' })
+            .catch(() => {
+            });
+        });
     }
-
   },
   methods: {
-    ...mapActions(['getOrderInfo']),
+    ...mapActions('Order', ['getOrderInfo']),
+    ...mapMutations('Order', ['updateOrderInfo']),
     goToPage() {
       this.$router.push({ name: 'Basket' });
     }
   },
+
   computed: {
-    ...mapGetters(['orderInfo', 'isLoading', 'requestError'])
+    ...mapGetters('Order', ['orderInfo', 'requestError']),
+    orderInfoBasket() {
+      return this.orderInfo ? this.orderInfo.basket.items : [];
+    }
   }
 };
 </script>
