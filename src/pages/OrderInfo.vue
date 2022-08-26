@@ -88,6 +88,7 @@ import BasketInfoOrder from '@/components/Basket/BasketInfoOrder';
 import Loader from '@/components/UI/Loader/Loader';
 import RequestError from '@/components/UI/RequestError';
 import { mapActions, mapGetters, mapMutations } from 'vuex';
+import instance from '@/axiosConfig';
 
 export default {
   components: {
@@ -100,29 +101,40 @@ export default {
       isLoading: false
     };
   },
-  methods: {
-    ...mapActions('Order', ['getOrderInfo']),
-    ...mapMutations('Order', ['updateOrderInfo']),
-  },
-  watch: {
-    '$route.params.id': {
-      handler(val) {
-        this.isLoading = true;
-        this.getOrderInfo(this.$route.params.id)
-          .then(res => {
-            this.isLoading = false;
-            this.updateOrderInfo(res.data);
-          })
-          .catch(() => {
-            this.isLoading = false;
-            this.$router.push({ name: '404' })
-              .catch(() => {
-              });
-          });
-      },
-      deep: true
+  mounted() {
+    if (!this.orderInfo) {
+      this.isLoading = true;
+      this.getOrderInfo(this.$route.params.id)
     }
   },
+  methods: {
+    ...mapMutations('Order', ['updateOrderInfo']),
+    getOrderInfo() {
+      return instance.get(`orders/${this.$route.params.id}`, {
+        params: {
+          orderId: this.$route.params.id,
+          userAccessKey: localStorage.getItem('userAccessKey')
+        }
+      }) .then(res => {
+        this.isLoading = false;
+        this.updateOrderInfo(res.data);
+      })
+        .catch((e) => {
+          this.isLoading = false;
+          this.$router.push({ name: '404' })
+            .catch(() => {
+            });
+        });
+    }
+  },
+watch: {
+  '$route.params.id': {
+    handler(val) {
+      this.getOrderInfo()
+    },
+    immediate: true
+  }
+},
   computed: {
     ...mapGetters('Order', ['orderInfo', 'requestError']),
     orderInfoBasket() {
