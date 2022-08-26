@@ -57,6 +57,7 @@
         <div v-else>К сожалению, ничего не найдено</div>
 
         <Pagination v-model="currentPage"
+                    v-if="pagesCount != 1"
                     :pages-count="pagesCount"
                     :current-page="currentPage"
                     :products-count="productsCount"

@@ -3,10 +3,6 @@
     <Loader v-if="isLoading"/>
     <div v-else>
       <div class="content__top">
-        <Breadcrumbs :crumbs="crumbs"
-                     @selectedCrumb="goToPage($event)"
-        />
-
         <h1 class="content__title">
           Заказ оформлен <span>№ {{ orderInfo.id }}</span>
         </h1>
@@ -89,7 +85,6 @@
 
 <script>
 import BasketInfoOrder from '@/components/Basket/BasketInfoOrder';
-import Breadcrumbs from '@/components/UI/Breadcrumbs';
 import Loader from '@/components/UI/Loader/Loader';
 import RequestError from '@/components/UI/RequestError';
 import { mapActions, mapGetters, mapMutations } from 'vuex';
@@ -97,40 +92,37 @@ import { mapActions, mapGetters, mapMutations } from 'vuex';
 export default {
   components: {
     BasketInfoOrder,
-    Breadcrumbs,
     Loader,
     RequestError
   },
   data() {
     return {
-      crumbs: ['Корзина', 'Информация о заказе'],
       isLoading: false
     };
-  },
-  mounted() {
-    if (!this.orderInfo) {
-      this.isLoading = true;
-      this.getOrderInfo(this.$route.params.id)
-        .then(res => {
-          this.isLoading = false;
-          this.updateOrderInfo(res.data);
-        })
-        .catch(() => {
-          this.isLoading = false;
-          this.$router.push({ name: '404' })
-            .catch(() => {
-            });
-        });
-    }
   },
   methods: {
     ...mapActions('Order', ['getOrderInfo']),
     ...mapMutations('Order', ['updateOrderInfo']),
-    goToPage() {
-      this.$router.push({ name: 'Basket' });
+  },
+  watch: {
+    '$route.params.id': {
+      handler(val) {
+        this.isLoading = true;
+        this.getOrderInfo(this.$route.params.id)
+          .then(res => {
+            this.isLoading = false;
+            this.updateOrderInfo(res.data);
+          })
+          .catch(() => {
+            this.isLoading = false;
+            this.$router.push({ name: '404' })
+              .catch(() => {
+              });
+          });
+      },
+      deep: true
     }
   },
-
   computed: {
     ...mapGetters('Order', ['orderInfo', 'requestError']),
     orderInfoBasket() {
